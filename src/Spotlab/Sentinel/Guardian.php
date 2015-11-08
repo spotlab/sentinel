@@ -23,7 +23,7 @@ class Guardian
     public function getWebsites()
     {
         // Return array
-        $return = array_keys($this->config['websites']);
+        $return = $this->config['websites'];
 
         // Exception if not defined
         if (empty($return)) {

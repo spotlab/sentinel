@@ -47,10 +47,37 @@ class Ping extends Command
         // Actions for every projects in config
         $websites = $guardian->getWebsites();
 
-        foreach ($websites as $website) {
+        foreach ($websites as $website => $config) {
 
             $output->writeln(sprintf('> Start project : <info>%s</info>', $website));
             $output->writeln('------------------------------');
+
+            // Création d'un gestionnaire curl
+            $ch = curl_init();
+
+            // Configuration de l'URL et d'autres options
+            curl_setopt($ch, CURLOPT_URL, $config['url']);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            if(!empty($config['method']) && $config['method'] == 'POST') curl_setopt($ch, CURLOPT_POST, true);
+            if(!empty($config['header'])) curl_setopt($ch, CURLOPT_HTTPHEADER, $config['header']);
+            if(!empty($config['content'])) curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($config['content']));
+
+            // // Exécution
+            curl_exec($ch);
+
+            // Vérification si une erreur est survenue
+            if(!curl_errno($ch)) {
+                $total_time = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
+                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $output->write('La requête a mis ' . $total_time . ' secondes (' . $http_code . ')');
+            } else {
+                $output->write(curl_error($ch));
+            }
+
+            // Fermeture du gestionnaire
+            curl_close($ch);
 
             $output->write("\n\n");
         }
