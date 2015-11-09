@@ -11,14 +11,14 @@
         <div id="container"></div>
         <div id="alarm"></div>
 
-        <script src="bower_components/jquery/jquery.min.js"></script>
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
         <script src="bower_components/lodash/lodash.min.js"></script>
         <script src="bower_components/moment/min/moment-with-locales.min.js"></script>
         <script src="bower_components/highcharts/highcharts.js"></script>
         <script>
             $(function () {
                 $(document).ready(function () {
-                    $.getScript( "js/dark-unica.js").done(function() {
+                    $.getScript( "bower_components/highcharts/themes/dark-unica.js").done(function() {
                         var series = [];
                         var iterate = {};
                         $.get("data/data.json", function(data_load) {

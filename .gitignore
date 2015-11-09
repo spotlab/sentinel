@@ -12,4 +12,3 @@ phpunit
 # Config files
 websites.yml
 data.json
-/web/bower_components

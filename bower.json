@@ -1,12 +1,12 @@
 {
   "name": "sentinel",
   "version": "0.0.0",
-  "homepage": "https://github.com/clementlamoureux/sentinel",
+  "homepage": "https://github.com/spotlab/sentinel",
   "authors": [
     "Léo Poiroux"
   ],
   "dependencies": {
-    "jquery": "1.8.2",
+    "jquery": "2.1.4",
     "lodash": "3.10.0",
     "moment":"2.10.6",
     "highcharts": "*"
