@@ -20,7 +20,7 @@ composer install
 
 #### Create websites.yml
 
----
+```
 websites:
   medococean:
     title: "MédocOcean"
@@ -48,7 +48,7 @@ websites:
       - "Cache-Control:no-cache"
       - "Content-Type:application/json;charset=UTF-8"
       - "Authorization:Basic cmV1bmlvbl93ZWJzaXRlIDo5ZjRmNWEzMA=="
-
+```
 
 #### Start backup command
 
