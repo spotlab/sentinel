@@ -211,8 +211,3 @@ Highcharts.theme = {
 
 // Apply the theme
 Highcharts.setOptions(Highcharts.theme);
-Highcharts.setOptions({
-    global: {
-        useUTC: false
-    }
-});

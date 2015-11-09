@@ -19,6 +19,12 @@
             $(function () {
                 $(document).ready(function () {
                     $.getScript( "bower_components/highcharts/themes/dark-unica.js").done(function() {
+                        Highcharts.setOptions({
+                            global: {
+                                useUTC: false
+                            }
+                        });
+
                         var series = [];
                         var iterate = {};
                         $.get("data/data.json", function(data_load) {
