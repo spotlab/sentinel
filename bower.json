@@ -9,7 +9,7 @@
     "jquery": "2.1.4",
     "lodash": "3.10.0",
     "moment":"2.10.6",
-    "highcharts": "*"
+    "highstock-release": "*"
   },
   "description": "",
   "main": "",

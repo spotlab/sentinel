@@ -1,0 +1,33 @@
+body {
+    background: #2a2a2b;
+    padding: 50px;
+}
+
+header {
+    overflow: hidden;
+    height: 120px;
+}
+
+    #logo {
+        float: left;
+    }
+
+    #alarm {
+        float: right;
+        margin: 20px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+    }
+
+    #alarm.good {
+        background: #2b908f url('../img/good.png') no-repeat 50% 50%;
+    }
+
+    #alarm.bad {
+        background: #f45b5b url('../img/bad.png') no-repeat 50% 50%;
+    }
+
+section {
+    margin-top: 30px;
+}

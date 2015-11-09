@@ -3,117 +3,22 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>{{ title }}</title>
-        <link rel="stylesheet" href="css/style.css" type="text/css" />
+        <link rel="stylesheet" href="css/styles.css" type="text/css" />
         <link rel="shortcut icon" href="img/favicon.ico" type="image/vnd.microsoft.icon" />
     </head>
     <body>
-        <img id="logo" src="img/logo.png" />
-        <div id="container"></div>
-        <div id="alarm"></div>
+        <header>
+            <img id="logo" src="img/logo.png" />
+            <div id="alarm" class="good"></div>
+        </header>
+        <section>
+            <div id="container"></div>
+        </section>
 
         <script src="bower_components/jquery/dist/jquery.min.js"></script>
         <script src="bower_components/lodash/lodash.min.js"></script>
         <script src="bower_components/moment/min/moment-with-locales.min.js"></script>
-        <script src="bower_components/highcharts/highcharts.js"></script>
-        <script>
-            $(function () {
-                $(document).ready(function () {
-                    $.getScript( "bower_components/highcharts/themes/dark-unica.js").done(function() {
-                        Highcharts.setOptions({
-                            global: {
-                                useUTC: false
-                            }
-                        });
-
-                        var series = [];
-                        var iterate = {};
-                        $.get("data/data.json", function(data_load) {
-                            _.each(data_load, function(serie, website){
-                                series.push({
-                                    name: website,
-                                    data: (function() {
-                                        var data = [];
-                                        _.each(serie, function(val, key){
-                                            console.log(moment(val.date, 'X').toDate());
-                                            data.push({
-                                                x: moment(val.date, 'X').toDate().getTime(),
-                                                y: val.total_time,
-                                            });
-                                        });
-                                        iterate[website] = data.length;
-                                        return data;
-                                    })()
-                                });
-                            });
-
-                            $('#container').highcharts({
-                                chart: {
-                                    type: 'spline',
-                                    animation: Highcharts.svg, // don't animate in old IE
-                                    marginRight: 10,
-                                    events: {
-                                        load: function () {
-                                            var data = {};
-                                            var series = this.series;
-
-                                            setInterval(function () {
-                                                $.get("data/data.json", function(data_load) {
-                                                    _.each(data_load, function(serie, website){
-                                                        _.each(_.slice(serie, iterate[website]), function(val, key){
-                                                            var x = moment(val.date, 'X').toDate().getTime();
-                                                            var y = val.total_time;
-
-                                                            if(val.total_time > 5) {
-                                                                $('#alarm').html('<audio autoplay loop><source src="alarm.mp3"></audio>');
-                                                            } else {
-                                                                $('#alarm').html('');
-                                                            }
-
-                                                            _.find(series, {'name': website}).addPoint([x, y],true,true);
-                                                            iterate[website]++;
-                                                        });
-                                                    });
-                                                });
-                                            }, 30000);
-                                        }
-                                    }
-                                },
-                                title: {
-                                    text: ''
-                                },
-                                xAxis: {
-                                    type: 'datetime',
-                                    tickPixelInterval: 150
-                                },
-                                yAxis: {
-                                    title: {
-                                        text: 'Seconds'
-                                    },
-                                    plotLines: [{
-                                        value: 0,
-                                        width: 1,
-                                        color: '#808080'
-                                    }]
-                                },
-                                tooltip: {
-                                    formatter: function () {
-                                        return '<b>' + this.series.name + '</b><br/>' +
-                                            Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-                                            Highcharts.numberFormat(this.y, 2);
-                                    }
-                                },
-                                legend: {
-                                    enabled: true
-                                },
-                                exporting: {
-                                    enabled: false
-                                },
-                                series: series
-                            });
-                        });
-                    });
-                });
-            });
-        </script>
+        <script src="bower_components/highstock-release/highstock.js"></script>
+        <script src="js/scripts.js"></script>
     </body>
 </html>

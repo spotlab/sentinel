@@ -48,6 +48,9 @@ class Ping extends Command
         $websites = $guardian->getWebsites();
         $data = $guardian->getData();
 
+        // Register time
+        $now = time();
+
         foreach ($websites as $website => $config) {
 
             $output->writeln(sprintf('> Start project : <info>%s</info>', $website));
@@ -76,7 +79,7 @@ class Ping extends Command
 
                 // Add Data
                 $data[$website][] = array(
-                    'date' => time(),
+                    'date' => $now,
                     'total_time' => $total_time,
                     'http_code' => $http_code,
                 );

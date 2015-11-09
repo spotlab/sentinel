@@ -51,7 +51,7 @@ class Guardian
             $return = json_decode(file_get_contents($this->data_file), true);
         }
 
-        return $return;
+        return $return['config'];
     }
 
     /**
@@ -62,12 +62,30 @@ class Guardian
         // If ping every minute
         // I want to save 1 week
         // So 60 * 24 * 7 = 10080
-
         $clean_data = array();
+        $alarm_data = array();
         foreach ($data as $website => $val) {
             $clean_data[$website] = array_slice($val, -10080, 10080, true);
+            $alarm_data[$website] = array_slice($val, -3, 3);
         }
 
-        file_put_contents($this->data_file, json_encode($clean_data));
+        // Average calcul
+        $calc = array();
+        $status = true;
+        foreach ($alarm_data as $website => $entry) {
+            foreach ($entry as $key => $val) {
+                $calc[] = $val['total_time'];
+                $status = ($val['http_code'] > 400 || !$status) ? false : true;
+            }
+        }
+        $average = round(array_sum($calc) / count($calc));
+
+        // Formated date
+        $format_data = array();
+        $format_data['status'] = $status;
+        $format_data['average'] = $average;
+        $format_data['config'] = $clean_data;
+
+        file_put_contents($this->data_file, json_encode($format_data));
     }
 }
