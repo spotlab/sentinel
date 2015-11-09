@@ -7,6 +7,7 @@ use Symfony\Component\Yaml\Yaml;
 class Guardian
 {
     protected $config;
+    protected $data_file;
 
     public function __construct($config_path)
     {
@@ -14,6 +15,11 @@ class Guardian
             $this->config = Yaml::parse($config_path);
         } else {
             throw new \Exception('Config file does not exists', 0);
+        }
+
+        $this->data_file = __DIR__ . '/../../../web/data/data.json';
+        if (!file_exists($this->data_file)) {
+            file_put_contents($this->data_file, json_encode(array()));
         }
     }
 
@@ -31,5 +37,39 @@ class Guardian
         }
 
         return $return;
+    }
+
+    /**
+     * @return array $return
+     */
+    public function getData()
+    {
+        // Return array
+        $return = array();
+
+        if (file_exists($this->data_file)) {
+            $return = json_decode(file_get_contents($this->data_file), true);
+        }
+
+        return $return;
+    }
+
+    /**
+     * @return array $return
+     */
+    public function setData($data = array())
+    {
+        // If ping every minute
+        // I want to save 1 week
+        // So 60 * 24 * 7 = 10080
+
+        $clean_data = array();
+        foreach ($data as $website => $val) {
+            $clean_data[$website] = array_slice($val, -10080, 10080, true);
+        }
+
+        print_r($clean_data);
+
+        file_put_contents($this->data_file, json_encode($clean_data));
     }
 }

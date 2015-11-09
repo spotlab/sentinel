@@ -46,6 +46,7 @@ class Ping extends Command
 
         // Actions for every projects in config
         $websites = $guardian->getWebsites();
+        $data = $guardian->getData();
 
         foreach ($websites as $website => $config) {
 
@@ -72,6 +73,13 @@ class Ping extends Command
                 $total_time = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
                 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 $output->write('La requête a mis ' . $total_time . ' secondes (' . $http_code . ')');
+
+                // Add Data
+                $data[$website][] = array(
+                    'date' => time(),
+                    'total_time' => $total_time,
+                    'http_code' => $http_code,
+                );
             } else {
                 $output->write(curl_error($ch));
             }
@@ -82,6 +90,10 @@ class Ping extends Command
             $output->write("\n\n");
         }
 
+        // Save date into file
+        $output->writeln('> Save data');
+        $output->writeln('------------------------------');
+        $guardian->setData($data);
         $output->writeln('Finished : <info>Done</info>');
     }
 }

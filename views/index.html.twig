@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>{{ title }}</title>
+    </head>
+    <body>
+        <div id="container"></div>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/lodash/3.10.1/lodash.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/momentjs/2.10.6/moment-with-locales.min.js"></script>
+        <script src="http://code.highcharts.com/highcharts.js"></script>
+        <script>
+            $(function () {
+                $(document).ready(function () {
+                    Highcharts.setOptions({
+                        global: {
+                            useUTC: false
+                        }
+                    });
+
+                    var series = [];
+                    var iterate = {};
+                    $.get("data/data.json", function(data_load) {
+                        _.each(data_load, function(serie, website){
+                            series.push({
+                                name: website,
+                                data: (function() {
+                                    var data = [];
+                                    _.each(serie, function(val, key){
+                                        console.log(moment(val.date, 'X').toDate());
+                                        data.push({
+                                            x: moment(val.date, 'X').toDate().getTime(),
+                                            y: val.total_time,
+                                        });
+                                    });
+                                    iterate[website] = data.length;
+                                    return data;
+                                })()
+                            });
+                        });
+
+                        $('#container').highcharts({
+                            chart: {
+                                type: 'spline',
+                                animation: Highcharts.svg, // don't animate in old IE
+                                marginRight: 10,
+                                events: {
+                                    load: function () {
+                                        var data = {};
+                                        var series = this.series;
+
+                                        setInterval(function () {
+                                            $.get("data/data.json", function(data_load) {
+                                                _.each(data_load, function(serie, website){
+                                                    _.each(_.slice(serie, iterate[website]), function(val, key){
+                                                        _.find(series, {'name': website}).addPoint(
+                                                            [moment(val.date, 'X').toDate().getTime(), val.total_time],
+                                                            true,
+                                                            true
+                                                        );
+                                                        iterate[website]++;
+                                                    });
+                                                });
+                                            });
+                                        }, 1000);
+                                    }
+                                }
+                            },
+                            title: {
+                                text: '{{ title }}'
+                            },
+                            xAxis: {
+                                type: 'datetime',
+                                tickPixelInterval: 150
+                            },
+                            yAxis: {
+                                title: {
+                                    text: 'Value'
+                                },
+                                plotLines: [{
+                                    value: 0,
+                                    width: 1,
+                                    color: '#808080'
+                                }]
+                            },
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>' + this.series.name + '</b><br/>' +
+                                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                                        Highcharts.numberFormat(this.y, 2);
+                                }
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            exporting: {
+                                enabled: false
+                            },
+                            series: series
+                        });
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>

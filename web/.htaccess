@@ -1,0 +1,7 @@
+# BEGIN Cache-Control Headers
+<ifmodule mod_headers.c>
+    <filesmatch "\\.(json)$">
+        Header set Cache-Control "no-cache, max-age=0, private"
+    </filesmatch>
+</ifmodule>
+# END Cache-Control Headers
