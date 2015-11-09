@@ -50,7 +50,7 @@ websites:
       - "Authorization:Basic cmV1bmlvbl93ZWJzaXRlIDo5ZjRmNWEzMA=="
 ```
 
-#### Start backup command
+#### Start ping command
 
 ```
 bin/sentinel ping websites.yml
