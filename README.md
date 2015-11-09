@@ -2,7 +2,7 @@
 
 Simple application that ping and save the response time of several urls. These times are shown on a graph updated in real time.
 
-![Image of Sentinel](https://framapic.org/HB3zFB3iGLmr/Gg69D6FX)
+![Image of Sentinel](https://framapic.org/ZT2gQ1J1CrIF/0o7xNb5g)
 
 ## Requirements
 
