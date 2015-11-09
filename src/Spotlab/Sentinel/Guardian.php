@@ -68,8 +68,6 @@ class Guardian
             $clean_data[$website] = array_slice($val, -10080, 10080, true);
         }
 
-        print_r($clean_data);
-
         file_put_contents($this->data_file, json_encode($clean_data));
     }
 }

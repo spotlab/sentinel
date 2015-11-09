@@ -1,0 +1,41 @@
+---
+websites:
+    medococean:
+        title: "MédocOcean"
+        url: "http://www.medococean.com/api/content/ts/medococean_v2/5fcdb1e3ec5fc7c8669f25a557d1da9f"
+        method: "POST"
+        content:
+            randomSeed: "21cc3553-bd4d-4745-a6d4-5bfa2f182b9e"
+            start: 0
+            size: 15
+            appType: "sentinel"
+        header:
+          - "Cache-Control:no-cache"
+          - "Content-Type:application/json;charset=UTF-8"
+          - "Authorization:Basic bWVkb2NvY2Vhbl93ZWJzaXRlOjA4OTFkMGJl"
+    reunion:
+        title: "Réunion"
+        url: "http://www.reunion.fr/api/content/ts/reunion_v2/9854b2d6d91f2b2e2d512f6fd086820c"
+        method: "POST"
+        content:
+            randomSeed: "21cc3553-bd4d-4745-a6d4-5bfa2f182b9e"
+            start: 0
+            size: 15
+            appType: "sentinel"
+        header:
+          - "Cache-Control:no-cache"
+          - "Content-Type:application/json;charset=UTF-8"
+          - "Authorization:Basic cmV1bmlvbl93ZWJzaXRlIDo5ZjRmNWEzMA=="
+    valleedordogne:
+        title: "Vallée Dordogne"
+        url: "http://www.vallee-dordogne.com/api/content/ts/valleedordogne_v2/30e3d142ffd8b8b62aa1ded047baa40a"
+        method: "POST"
+        content:
+            randomSeed: "21cc3553-bd4d-4745-a6d4-5bfa2f182b9e"
+            start: 0
+            size: 15
+            appType: "sentinel"
+        header:
+          - "Cache-Control:no-cache"
+          - "Content-Type:application/json;charset=UTF-8"
+          - "Authorization:Basic cHVibGljX3ZhbGxlZWRvcmRvZ25lX3dlYnNpdGU6MTQ3NTQyYTk1YmZhMjEzMDExMWQwOWUzZjZkOGE0MjE="
