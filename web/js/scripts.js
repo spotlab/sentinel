@@ -111,7 +111,8 @@ $(function () {
                     });
                     iterate[website] = data.length;
                     return data;
-                })()
+                })(),
+                turboThreshold: 0
             });
         });
 
