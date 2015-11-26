@@ -103,7 +103,7 @@ $(function () {
         }
 
         if(data_load.average < 1) {
-            $('#average .time').html((data_load.average*100) + 'ms');
+            $('#average .time').html((data_load.average*1000) + 'ms');
         } else {
             $('#average .time').html(data_load.average + 's');
         }
