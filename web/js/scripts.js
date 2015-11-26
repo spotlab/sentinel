@@ -102,7 +102,7 @@ $(function () {
                 .empty();
         }
 
-        if(data_load.average < 0) {
+        if(data_load.average < 1) {
             $('#average .time').html((data_load.average*100) + 'ms');
         } else {
             $('#average .time').html(data_load.average + 's');
