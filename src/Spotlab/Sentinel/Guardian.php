@@ -78,7 +78,7 @@ class Guardian
                 $status = ($val['http_code'] > 400 || !$status) ? false : true;
             }
         }
-        $average = round(array_sum($calc) / count($calc));
+        $average = round(array_sum($calc) / count($calc) * 100) / 100;
 
         // Formated date
         $format_data = array();

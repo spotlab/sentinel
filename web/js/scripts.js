@@ -34,7 +34,7 @@ $(function () {
 
                                     alarmTest(data_load);
                                 });
-                            }, 2000);
+                            }, 30000);
                         }
                     }
                 },
@@ -95,14 +95,14 @@ $(function () {
                 .removeClass('good')
                 .addClass('bad')
                 .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
-
-            console.log("ALARM : average = " + data_load.average + "s");
         } else {
             $('#alarm')
                 .removeClass('bad')
                 .addClass('good')
                 .empty();
         }
+
+        $('#average .time').html(data_load.average + 's');
     };
 
     // Init call
