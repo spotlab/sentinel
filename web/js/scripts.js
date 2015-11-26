@@ -1,5 +1,5 @@
 $(function () {
-    var iterate = {};
+    var lastPing = {};
     var seriesOptions = [];
 
     // create the chart when all data is loaded
@@ -22,28 +22,19 @@ $(function () {
                             setInterval(function () {
                                 $.getJSON("data/data.json", function(data_load) {
                                     _.each(data_load.config, function(serie, website){
-                                        _.each(_.slice(serie, iterate[website]), function(val, key){
-                                            var x = moment(val.date, 'X').toDate().getTime();
-                                            var y = val.total_time;
-                                            _.find(series, {'name': website}).addPoint([x, y],true,true);
-                                            iterate[website]++;
+                                        _.each(serie, function(val, key){
+                                            if(val.date > lastPing[website]) {
+                                                var x = moment(val.date, 'X').toDate().getTime();
+                                                var y = val.total_time;
+                                                _.find(series, {'name': website}).addPoint([x, y],true,true);
+                                                lastPing[website] = val.date;
+                                            }
                                         });
                                     });
 
-                                    // Add Alarm
-                                    if(data_load.status == 'false' || data_load.average >= 5) {
-                                        $('#alarm')
-                                            .removeClass('good')
-                                            .addClass('bad')
-                                            .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
-                                    } else {
-                                        $('#alarm')
-                                            .removeClass('bad')
-                                            .addClass('good')
-                                            .empty();
-                                    }
+                                    alarmTest(data_load);
                                 });
-                            }, 30000);
+                            }, 2000);
                         }
                     }
                 },
@@ -96,6 +87,24 @@ $(function () {
         });
     };
 
+    // Alarm test
+    alarmTest = function (data_load) {
+        // Add Alarm
+        if(data_load.status == 'false' || data_load.average > 2) {
+            $('#alarm')
+                .removeClass('good')
+                .addClass('bad')
+                .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
+
+            console.log("ALARM : average = " + data_load.average + "s");
+        } else {
+            $('#alarm')
+                .removeClass('bad')
+                .addClass('good')
+                .empty();
+        }
+    };
+
     // Init call
     $.getJSON("data/data.json", function(data_load) {
         _.each(data_load.config, function(serie, website){
@@ -108,14 +117,15 @@ $(function () {
                             x: moment(val.date, 'X').toDate().getTime(),
                             y: val.total_time,
                         });
+                        lastPing[website] = val.date;
                     });
-                    iterate[website] = data.length;
                     return data;
                 })(),
                 turboThreshold: 0
             });
         });
 
+        alarmTest(data_load);
         createChart();
     });
 });
