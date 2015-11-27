@@ -114,6 +114,9 @@ $(function () {
         _.each(data_load.config, function(serie, website){
             seriesOptions.push({
                 name: website,
+                dataGrouping: {
+                    approximation: "high"
+                },
                 data: (function() {
                     var data = [];
                     _.each(serie, function(val, key){
