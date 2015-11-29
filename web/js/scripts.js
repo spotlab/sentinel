@@ -1,7 +1,9 @@
 $(function () {
     var lastPing = {};
     var seriesOptions = [];
-
+    var extreme = 1;
+    var dataRaw;
+    var setGeneralAverage;
     // create the chart when all data is loaded
     createChart = function () {
         $.getScript( "js/dark-unica-sentinel.js").done(function() {
@@ -21,6 +23,7 @@ $(function () {
 
                             setInterval(function () {
                                 $.getJSON("data/data.json", function(data_load) {
+                                    dataRaw = data_load;
                                     _.each(data_load.config, function(serie, website){
                                         _.each(serie, function(val, key){
                                             if(val.date > lastPing[website]) {
@@ -31,7 +34,8 @@ $(function () {
                                             }
                                         });
                                     });
-
+                                    setAverage();
+                                    setGeneralAverage();
                                     alarmTest(data_load);
                                 });
                             }, 30000);
@@ -50,6 +54,18 @@ $(function () {
                         width: 2,
                         color: 'silver'
                     }]
+                },
+
+                xAxis: {
+                    events: {
+                        setExtremes: function(e) {
+                            if(typeof(e.rangeSelectorButton)!== 'undefined')
+                            {
+                                extreme = e.rangeSelectorButton.count;
+                                setGeneralAverage();
+                            }
+                        }
+                    }
                 },
 
                 tooltip: {
@@ -101,16 +117,32 @@ $(function () {
                 .addClass('good')
                 .empty();
         }
+    };
 
-        if(data_load.average < 1) {
-            $('#average .time').html((data_load.average*1000) + 'ms');
+    // Instant Average
+    setAverage = function () {
+        replaceAverage('#average .time', dataRaw.average);
+    };
+
+    // General Average
+    setGeneralAverage = function () {
+        if (extreme == undefined) {
+            extreme = 0;
+        }
+        replaceAverage('#averagePeriod .time', dataRaw.generalAverage[extreme]);
+    };
+
+    replaceAverage = function (target, data) {
+        if (data < 1) {
+            $(target).html((data * 1000) + 'ms');
         } else {
-            $('#average .time').html(data_load.average + 's');
+            $(target).html(data + 's');
         }
     };
 
     // Init call
     $.getJSON("data/data.json", function(data_load) {
+        dataRaw = data_load;
         _.each(data_load.config, function(serie, website){
             seriesOptions.push({
                 name: website,
@@ -122,7 +154,7 @@ $(function () {
                     _.each(serie, function(val, key){
                         data.push({
                             x: moment(val.date, 'X').toDate().getTime(),
-                            y: val.total_time,
+                            y: val.total_time
                         });
                         lastPing[website] = val.date;
                     });
@@ -131,8 +163,9 @@ $(function () {
                 turboThreshold: 0
             });
         });
-
-        alarmTest(data_load);
         createChart();
+        setAverage();
+        setGeneralAverage();
+        alarmTest(data_load);
     });
 });

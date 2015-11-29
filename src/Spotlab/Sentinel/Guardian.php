@@ -54,37 +54,59 @@ class Guardian
         return $return['config'];
     }
 
+    private function getDataFromDuration($data, $hours = 1)
+    {
+        $pingByHour = 60;
+        return array_slice($data, -$pingByHour * $hours, $pingByHour * $hours, true);
+    }
+
     /**
      * @return array $return
      */
-    public function setData($data = array())
+    public function setData($data = [])
     {
-        // If ping every minute
-        // I want to save 1 week
-        // So 60 * 24 * 7 = 10080
-        $clean_data = array();
-        $alarm_data = array();
+        $clean_data = $alarm_data = $duration = [];
         foreach ($data as $website => $val) {
-            $clean_data[$website] = array_slice($val, -10080, 10080, true);
-            $alarm_data[$website] = array_slice($val, -3, 3);
+            $duration[1][$website]  = $this->getDataFromDuration($val);
+            $duration[3][$website]  = $this->getDataFromDuration($val, 3);
+            $duration[24][$website] = $this->getDataFromDuration($val, 24);
+            $clean_data[$website]   = $this->getDataFromDuration($val, 24 * 7); // 1 week
+            $alarm_data[$website]   = array_slice($val, -3, 3);
+        }
+        $duration[0] = $clean_data; // Unlimited duration
+
+        // General average calcul
+        $generalAverage = [];
+        foreach ($duration as $period => $data) {
+            $count = $generalAverage[$period] = 0;
+            foreach ($data as $website) {
+                foreach ($website as $step) {
+                    $count++;
+                    $generalAverage[$period] += $step['total_time'];
+                }
+            }
+            $generalAverage[$period] /= ($count!==0) ? $count : 1;
+            $generalAverage[$period] = round($generalAverage[$period] * 100) / 100;
         }
 
-        // Average calcul
-        $calc = array();
+        // Last average calcul
+        $calc = [];
         $status = true;
         foreach ($alarm_data as $website => $entry) {
             foreach ($entry as $key => $val) {
                 $calc[] = $val['total_time'];
-                $status = ($val['http_code'] > 400 || !$status) ? false : true;
+                $status = ($val['http_code'] < 400 && $status);
             }
         }
         $average = round(array_sum($calc) / count($calc) * 100) / 100;
 
-        // Formated date
-        $format_data = array();
-        $format_data['status'] = $status;
-        $format_data['average'] = $average;
-        $format_data['config'] = $clean_data;
+        // Format data
+        $format_data = [
+            'status'         => $status,
+            'average'        => $average,
+            'generalAverage' => $generalAverage,
+            'config'         => $clean_data
+        ];
 
         file_put_contents($this->data_file, json_encode($format_data));
     }

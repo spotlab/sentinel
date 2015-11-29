@@ -32,13 +32,26 @@ header {
 
     #average {
         float: right;
-        margin: 40px 20px;
-        width: 160px;
+        margin: 40px 10px;
+        width: 180px;
         height: 100px;
         text-align: center;
     }
 
     #average .time{
+        font-size: 50px;
+        font-weight: bold;
+    }
+
+    #averagePeriod {
+        float: right;
+        margin: 40px 10px;
+        width: 180px;
+        height: 100px;
+        text-align: center;
+    }
+
+    #averagePeriod .time{
         font-size: 50px;
         font-weight: bold;
     }
