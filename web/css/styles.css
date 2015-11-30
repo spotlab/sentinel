@@ -22,30 +22,34 @@ header {
         border-radius: 50%;
     }
 
-    #alarm.good {
-        background: #2b908f url('../img/good.png') no-repeat 50% 50%;
-    }
+        #alarm.good {
+            background: #2b908f url('../img/good.png') no-repeat 50% 50%;
+        }
 
-    #alarm.status_error {
-        background: #f7c222 url('../img/warning.png') no-repeat 50% 50%;
-    }
+        #alarm.status_error {
+            background: #f7c222 url('../img/warning.png') no-repeat 50% 50%;
+        }
 
-    #alarm.average_error {
-        background: #f45b5b url('../img/alarm.png') no-repeat 50% 50%;
-    }
+        #alarm.average_error {
+            background: #f45b5b url('../img/alarm.png') no-repeat 50% 50%;
+        }
 
-    #average {
+    #legend {
         float: right;
         margin: 40px 20px;
         width: 160px;
         height: 100px;
         text-align: center;
     }
+        #legend .average,
+        #legend .status{
+            display: none;
+        }
 
-    #average .time{
-        font-size: 50px;
-        font-weight: bold;
-    }
+        #legend .data{
+            font-size: 50px;
+            font-weight: bold;
+        }
 
 section {
     margin-top: 30px;

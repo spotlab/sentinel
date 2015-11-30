@@ -96,30 +96,30 @@ $(function () {
                 .addClass('status_error')
                 .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
 
-            $('#average').hide();
-            $('#status .number').html(data_load.status);
+            $('.average').hide();
+            $('.status').show().find('.data').html(data_load.status);
         } else if(data_load.average > 2) {
             $('#alarm')
                 .removeClass()
                 .addClass('average_error')
                 .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
 
-            $('#average').show();
-            $('#status').hide();
+            $('.average').show();
+            $('.status').hide();
         } else {
             $('#alarm')
                 .removeClass()
                 .addClass('good')
                 .empty();
 
-            $('#average').show();
-            $('#status').hide();
+            $('.average').show();
+            $('.status').hide();
         }
 
         if(data_load.average < 1) {
-            $('#average .time').html((data_load.average*1000) + 'ms');
+            $('.average .data').html((data_load.average*1000) + 'ms');
         } else {
-            $('#average .time').html(data_load.average + 's');
+            $('.average .data').html(data_load.average + 's');
         }
     };
 
