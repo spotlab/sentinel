@@ -97,6 +97,7 @@ $(function () {
                 .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
 
             $('#average').hide();
+            $('#status .number').html(data_load.status);
         } else if(data_load.average > 2) {
             $('#alarm')
                 .removeClass()
@@ -104,6 +105,7 @@ $(function () {
                 .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
 
             $('#average').show();
+            $('#status').hide();
         } else {
             $('#alarm')
                 .removeClass()
@@ -111,6 +113,7 @@ $(function () {
                 .empty();
 
             $('#average').show();
+            $('#status').hide();
         }
 
         if(data_load.average < 1) {

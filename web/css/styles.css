@@ -27,11 +27,11 @@ header {
     }
 
     #alarm.status_error {
-        background: #f45b5b url('../img/bad.png') no-repeat 50% 50%;
+        background: #f7c222 url('../img/warning.png') no-repeat 50% 50%;
     }
 
-    #alarm.status_average {
-        background: #f45b5b url('../img/bad.png') no-repeat 50% 50%;
+    #alarm.average_error {
+        background: #f45b5b url('../img/alarm.png') no-repeat 50% 50%;
     }
 
     #average {
