@@ -63,9 +63,9 @@ class Guardian
     /**
      * @return array $return
      */
-    public function setData($data = [])
+    public function setData($data = array())
     {
-        $clean_data = $alarm_data = $duration = [];
+        $clean_data = $alarm_data = $duration = array();
         foreach ($data as $website => $val) {
             $duration[1][$website]  = $this->getDataFromDuration($val);
             $duration[3][$website]  = $this->getDataFromDuration($val, 3);
@@ -76,37 +76,39 @@ class Guardian
         $duration[0] = $clean_data; // Unlimited duration
 
         // General average calcul
-        $generalAverage = [];
-        foreach ($duration as $period => $data) {
+        $generalAverage = array();
+        foreach ($duration as $period => $websites) {
             $count = $generalAverage[$period] = 0;
-            foreach ($data as $website) {
-                foreach ($website as $step) {
+            foreach ($websites as $website => $entry) {
+                foreach ($entry as $val) {
                     $count++;
-                    $generalAverage[$period] += $step['total_time'];
+                    $generalAverage[$period] += $val['total_time'];
                 }
             }
-            $generalAverage[$period] /= ($count!==0) ? $count : 1;
-            $generalAverage[$period] = round($generalAverage[$period] * 100) / 100;
+            $count = ($count!==0) ? $count : 1;
+            $generalAverage[$period] = round($generalAverage[$period] / $count * 100) / 100;
         }
 
         // Last average calcul
-        $calc = [];
+        $calc = $count = 0;
         $status = true;
         foreach ($alarm_data as $website => $entry) {
             foreach ($entry as $key => $val) {
-                $calc[] = $val['total_time'];
+                $count++;
+                $calc  += $val['total_time'];
                 $status = ($val['http_code'] < 400 && $status);
             }
         }
-        $average = round(array_sum($calc) / count($calc) * 100) / 100;
+        $count   = ($count!==0) ? $count : 1;
+        $average = round($calc / $count * 100) / 100;
 
         // Format data
-        $format_data = [
+        $format_data = array(
             'status'         => $status,
             'average'        => $average,
             'generalAverage' => $generalAverage,
             'config'         => $clean_data
-        ];
+        );
 
         file_put_contents($this->data_file, json_encode($format_data));
     }
