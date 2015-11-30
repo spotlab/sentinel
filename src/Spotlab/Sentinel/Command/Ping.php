@@ -77,6 +77,11 @@ class Ping extends Command
                 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 $output->write('La requête a mis ' . $total_time . ' secondes (' . $http_code . ')');
 
+                // if http_code error
+                if ($http_code >= 400) {
+                    $total_time = 0;
+                }
+
                 // Add Data
                 $data[$website][] = array(
                     'date' => $now,

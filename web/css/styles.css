@@ -26,7 +26,11 @@ header {
         background: #2b908f url('../img/good.png') no-repeat 50% 50%;
     }
 
-    #alarm.bad {
+    #alarm.status_error {
+        background: #f45b5b url('../img/bad.png') no-repeat 50% 50%;
+    }
+
+    #alarm.status_average {
         background: #f45b5b url('../img/bad.png') no-repeat 50% 50%;
     }
 

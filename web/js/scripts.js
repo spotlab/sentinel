@@ -90,16 +90,27 @@ $(function () {
     // Alarm test
     alarmTest = function (data_load) {
         // Add Alarm
-        if(data_load.status == 'false' || data_load.average > 2) {
+        if(data_load.status != 200) {
             $('#alarm')
-                .removeClass('good')
-                .addClass('bad')
+                .removeClass()
+                .addClass('status_error')
                 .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
+
+            $('#average').hide();
+        else if(data_load.average > 2) {
+            $('#alarm')
+                .removeClass()
+                .addClass('average_error')
+                .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
+
+            $('#average').show();
         } else {
             $('#alarm')
-                .removeClass('bad')
+                .removeClass()
                 .addClass('good')
                 .empty();
+
+            $('#average').show();
         }
 
         if(data_load.average < 1) {
