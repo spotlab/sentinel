@@ -97,7 +97,7 @@ $(function () {
                 .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
 
             $('#average').hide();
-        else if(data_load.average > 2) {
+        } else if(data_load.average > 2) {
             $('#alarm')
                 .removeClass()
                 .addClass('average_error')
