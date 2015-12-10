@@ -1,56 +1,59 @@
 body {
-    background: #2a2a2b;
-    padding: 50px;
-    font-family: sans-serif;
+  padding-top: 70px;
+  padding-bottom: 30px;
+  background: #2a2a2b;
+}
+
+.navbar-brand {
+    background: url('../img/logo.png') no-repeat;
+    background-size: contain;
+    height: 40px;
+    width: 220px;
+    margin: 5px;
+}
+
+.navbar-brand span{
+    display: none;
+}
+
+.graphs {
+    margin-bottom: 20px;
+}
+
+
+.alarm {
+    padding-top: 120px;
+}
+
+.alarm .icon {
+    margin: 20px auto;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+
+.alarm .good {
+    background: #2b908f url('../img/good.png') no-repeat 50% 50%;
+}
+
+.alarm .status_error {
+    background: #f7c222 url('../img/warning.png') no-repeat 50% 50%;
+}
+
+.alarm .average_error {
+    background: #f45b5b url('../img/alarm.png') no-repeat 50% 50%;
+}
+
+.alarm .legend{
     color: #fff;
+    text-align: center;
 }
 
-header {
-    overflow: hidden;
-    height: 120px;
+.alarm .legend .data{
+    font-size: 30px;
 }
 
-    #logo {
-        float: left;
-    }
-
-    #alarm {
-        float: right;
-        margin: 20px;
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-    }
-
-        #alarm.good {
-            background: #2b908f url('../img/good.png') no-repeat 50% 50%;
-        }
-
-        #alarm.status_error {
-            background: #f7c222 url('../img/warning.png') no-repeat 50% 50%;
-        }
-
-        #alarm.average_error {
-            background: #f45b5b url('../img/alarm.png') no-repeat 50% 50%;
-        }
-
-    #legend {
-        float: right;
-        margin: 40px 20px;
-        width: 160px;
-        height: 100px;
-        text-align: center;
-    }
-        #legend .average,
-        #legend .status{
-            display: none;
-        }
-
-        #legend .data{
-            font-size: 50px;
-            font-weight: bold;
-        }
-
-section {
-    margin-top: 30px;
+.alarm .legend .data{
+    font-size: 40px;
+    font-weight: bold;
 }

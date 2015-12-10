@@ -6,10 +6,11 @@
     "Léo Poiroux"
   ],
   "dependencies": {
-    "jquery": "2.1.4",
-    "lodash": "3.10.0",
-    "moment":"2.10.6",
-    "highstock-release": "*"
+    "jquery": "^2.1",
+    "lodash": "^3.10",
+    "moment":"^2.10",
+    "highstock-release": "^2.1",
+    "bootstrap": "^3.0"
   },
   "description": "",
   "main": "",

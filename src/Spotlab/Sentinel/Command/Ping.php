@@ -2,7 +2,7 @@
 
 namespace Spotlab\Sentinel\Command;
 
-use Spotlab\Sentinel\Guardian;
+use Spotlab\Sentinel\Tools\Guardian;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,15 +45,15 @@ class Ping extends Command
         $output->write("\n");
 
         // Actions for every projects in config
-        $websites = $guardian->getWebsites();
+        $requests = $guardian->getRequests();
         $data = $guardian->getData();
 
         // Register time
         $now = time();
 
-        foreach ($websites as $website => $config) {
+        foreach ($requests as $line => $config) {
 
-            $output->writeln(sprintf('> Start project : <info>%s</info>', $website));
+            $output->writeln(sprintf('> Start : <info>%s</info>', $line));
             $output->writeln('------------------------------');
 
             // Création d'un gestionnaire curl
@@ -83,7 +83,7 @@ class Ping extends Command
                 }
 
                 // Add Data
-                $data[$website][] = array(
+                $data[$line][] = array(
                     'date' => $now,
                     'total_time' => $total_time,
                     'http_code' => $http_code,

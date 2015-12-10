@@ -1,18 +1,19 @@
 <?php
 
+date_default_timezone_set('Europe/Paris');
+
 // web/index.php
+$filename = __DIR__.preg_replace('#(\?.*)$#', '', $_SERVER['REQUEST_URI']);
+if (php_sapi_name() === 'cli-server' && is_file($filename)) {
+    return false;
+}
+
 require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Silex\Application();
+$app['debug'] = true;
 
-$app->register(new Silex\Provider\TwigServiceProvider(), array(
-    'twig.path' => __DIR__.'/../views',
-));
-
-$app->get('/', function () use ($app) {
-    return $app['twig']->render('index.html.twig', array(
-        'title' => 'Sentinel',
-    ));
-});
+// Routing
+$app->register(new Spotlab\Sentinel\Provider\GuardianProvider(), array());
 
 $app->run();

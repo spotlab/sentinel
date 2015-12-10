@@ -10,5 +10,5 @@ phpunit
 /composer.phar
 
 # Config files
-websites.yml
-data.json
+*.yml
+*.json

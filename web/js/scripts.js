@@ -1,9 +1,42 @@
 $(function () {
-    var lastPing = {};
-    var seriesOptions = [];
+
+    // Init call
+    $('.graphs').each(function(){
+        var container = $(this);
+        var json = container.attr('data-json');
+
+        var lastPing = {};
+        var seriesOptions = [];
+
+        $.getJSON(json, function(data_load) {
+            _.each(data_load.config, function(serie, website){
+                seriesOptions.push({
+                    name: website,
+                    dataGrouping: {
+                        approximation: "high"
+                    },
+                    data: (function() {
+                        var data = [];
+                        _.each(serie, function(val, key){
+                            data.push({
+                                x: moment(val.date, 'X').toDate().getTime(),
+                                y: val.total_time,
+                            });
+                            lastPing[website] = val.date;
+                        });
+                        return data;
+                    })(),
+                    turboThreshold: 0
+                });
+            });
+
+            createAlarm(container, data_load);
+            createChart(container, json, lastPing, seriesOptions);
+        });
+    });
 
     // create the chart when all data is loaded
-    createChart = function () {
+    createChart = function (container, json, lastPing, seriesOptions) {
         $.getScript( "js/dark-unica-sentinel.js").done(function() {
             Highcharts.setOptions({
                 global: {
@@ -11,7 +44,7 @@ $(function () {
                 }
             });
 
-            $('#container').highcharts('StockChart', {
+            container.find('.highstock').highcharts('StockChart', {
                 chart : {
                     type: 'spline',
                     events: {
@@ -20,7 +53,7 @@ $(function () {
                             var series = this.series;
 
                             setInterval(function () {
-                                $.getJSON("data/data.json", function(data_load) {
+                                $.getJSON(json, function(data_load) {
                                     _.each(data_load.config, function(serie, website){
                                         _.each(serie, function(val, key){
                                             if(val.date > lastPing[website]) {
@@ -32,7 +65,7 @@ $(function () {
                                         });
                                     });
 
-                                    alarmTest(data_load);
+                                    updateAlarm(container, data_load);
                                 });
                             }, 30000);
                         }
@@ -88,65 +121,43 @@ $(function () {
     };
 
     // Alarm test
-    alarmTest = function (data_load) {
+    createAlarm = function (container, data_load) {
+        var alarm = container.find('.alarm');
+        var icon = $('<div class="icon"></div>');
+        var legend = $('<div class="legend"><div class="title"></div><div class="data"></div></div>');
+
+        // Append HTML
+        alarm.append(icon).append(legend);
+
+        // Added data
+        updateAlarm(container, data_load);
+    };
+
+    // Alarm test
+    updateAlarm = function (container, data_load) {
+        var alarm = container.find('.alarm');
+        var icon = container.find('.icon');
+        var legend = container.find('.legend');
+
+        // .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
+
         // Add Alarm
         if(data_load.status != 200) {
-            $('#alarm')
-                .removeClass()
-                .addClass('status_error')
-                .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
-
-            $('.average').hide();
-            $('.status').show().find('.data').html(data_load.status);
+            icon.removeClass().addClass('icon status_error');
+            legend.find('.title').html('Erreur').end().find('.data').html(data_load.status);
         } else if(data_load.average > 2) {
-            $('#alarm')
-                .removeClass()
-                .addClass('average_error')
-                .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
-
-            $('.average').show();
-            $('.status').hide();
+            icon.removeClass().addClass('icon average_error');
+            legend.find('.title').html('Temps moyen').end().find('.data').html(data_load.average + 's');
         } else {
-            $('#alarm')
-                .removeClass()
-                .addClass('good')
-                .empty();
+            if(data_load.average < 1) {
+                average = (data_load.average*1000) + 'ms';
+            } else {
+                average = data_load.average + 's';
+            }
 
-            $('.average').show();
-            $('.status').hide();
-        }
-
-        if(data_load.average < 1) {
-            $('.average .data').html((data_load.average*1000) + 'ms');
-        } else {
-            $('.average .data').html(data_load.average + 's');
+            icon.removeClass().addClass('icon good');
+            legend.find('.title').html('Temps moyen').end().find('.data').html(average);
         }
     };
 
-    // Init call
-    $.getJSON("data/data.json", function(data_load) {
-        _.each(data_load.config, function(serie, website){
-            seriesOptions.push({
-                name: website,
-                dataGrouping: {
-                    approximation: "high"
-                },
-                data: (function() {
-                    var data = [];
-                    _.each(serie, function(val, key){
-                        data.push({
-                            x: moment(val.date, 'X').toDate().getTime(),
-                            y: val.total_time,
-                        });
-                        lastPing[website] = val.date;
-                    });
-                    return data;
-                })(),
-                turboThreshold: 0
-            });
-        });
-
-        alarmTest(data_load);
-        createChart();
-    });
 });

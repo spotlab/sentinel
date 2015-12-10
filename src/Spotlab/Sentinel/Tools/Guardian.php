@@ -1,12 +1,13 @@
 <?php
 
-namespace Spotlab\Sentinel;
+namespace Spotlab\Sentinel\Tools;
 
 use Symfony\Component\Yaml\Yaml;
 
 class Guardian
 {
     protected $config;
+    protected $config_name;
     protected $data_file;
 
     public function __construct($config_path)
@@ -17,23 +18,28 @@ class Guardian
             throw new \Exception('Config file does not exists', 0);
         }
 
-        $this->data_file = __DIR__ . '/../../../web/data/data.json';
+        reset($this->config);
+        $this->config_name = key($this->config);
+
+        $this->data_file = __DIR__ . '/../../../../web/data/' . $this->config_name . '.json';
         if (!file_exists($this->data_file)) {
-            file_put_contents($this->data_file, json_encode(array()));
+            file_put_contents($this->data_file, json_encode(
+                array('config' => array())
+            ));
         }
     }
 
     /**
      * @return array $return
      */
-    public function getWebsites()
+    public function getRequests()
     {
         // Return array
-        $return = $this->config['websites'];
+        $return = $this->config[$this->config_name];
 
         // Exception if not defined
         if (empty($return)) {
-            throw new \Exception('No "project" to backup find on config file', 0);
+            throw new \Exception('No "project" find on config file', 0);
         }
 
         return $return;
@@ -49,9 +55,10 @@ class Guardian
 
         if (file_exists($this->data_file)) {
             $return = json_decode(file_get_contents($this->data_file), true);
+            $return = $return['config'];
         }
 
-        return $return['config'];
+        return $return;
     }
 
     /**
