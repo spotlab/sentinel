@@ -67,8 +67,12 @@ class GuardianProvider implements ServiceProviderInterface, ControllerProviderIn
 
             $graphs = array();
             foreach ($finder as $file) {
+                $name = $file->getRelativePathname();
+                $name = str_replace('.json', '', $name);
+                $name = str_replace('_', ' ', $name);
+
                 $graphs[] = array(
-                    'name' => str_replace('.json', '', $file->getRelativePathname()),
+                    'name' => $name,
                     'file' => 'data/' . $file->getRelativePathname(),
                 );
             }
