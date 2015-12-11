@@ -59,7 +59,11 @@ class GuardianProvider implements ServiceProviderInterface, ControllerProviderIn
         $controllers->match('/', function (Request $request) use ($app) {
 
             $finder = new Finder();
-            $finder->files()->name('*.json')->in($app['sentinel.data.json']);
+            $finder
+                ->files()
+                ->name('*.json')
+                ->sortByName()
+                ->in($app['sentinel.data.json']);
 
             $graphs = array();
             foreach ($finder as $file) {
