@@ -10,6 +10,7 @@ use Silex\Provider\TwigServiceProvider;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Guardian Provider.
@@ -28,6 +29,7 @@ class GuardianProvider implements ServiceProviderInterface, ControllerProviderIn
      */
     public function register(Application $app)
     {
+        $app['sentinel.name'] = 'Sentinel';
         $app['sentinel.data.json'] = __DIR__ . '/../../../../web/data';
         $app['sentinel.twig.path'] = __DIR__ . '/../../../../views';
     }
@@ -56,34 +58,67 @@ class GuardianProvider implements ServiceProviderInterface, ControllerProviderIn
     {
         /** @var $controllers \Silex\ControllerCollection */
         $controllers = $app['controllers_factory'];
+
+        // Graphs display
         $controllers->match('/', function (Request $request) use ($app) {
 
-            $finder = new Finder();
-            $finder
-                ->files()
-                ->name('*.json')
-                ->sortByName()
-                ->in($app['sentinel.data.json']);
-
-            $graphs = array();
-            foreach ($finder as $file) {
-                $name = $file->getRelativePathname();
-                $name = str_replace('.json', '', $name);
-                $name = str_replace('_', ' ', $name);
-
-                $graphs[] = array(
-                    'name' => $name,
-                    'file' => 'data/' . $file->getRelativePathname(),
-                );
-            }
+            $graphs = $this->getGraphs($app);
 
             return $app['twig']->render('index.html.twig', array(
-                'title' => 'Sentinel',
+                'title' => $app['sentinel.name'],
                 'graphs' => $graphs
             ));
 
         });
 
+        // Ping status
+        $controllers->match('/ping', function (Request $request) use ($app) {
+
+            $graphs = $this->getGraphs($app);
+            $status = 200;
+            $return = array();
+
+            foreach ($graphs as $key => $val) {
+                $data = file_get_contents($val['file']);
+                $data = json_decode($data, true);
+                $return[$key]['name'] = $val['name'];
+                $return[$key]['status'] = $data['status'];
+                $return[$key]['average'] = $data['average'];
+
+                if($data['status'] >= 400) {
+                    $status = $data['status'];
+                }
+            }
+
+            $response = new JsonResponse($return);
+            $response->setStatusCode($status);
+            return $response;
+        });
+
         return $controllers;
+    }
+
+    private function getGraphs(Application $app)
+    {
+        $finder = new Finder();
+        $finder
+            ->files()
+            ->name('*.json')
+            ->sortByName()
+            ->in($app['sentinel.data.json']);
+
+        $graphs = array();
+        foreach ($finder as $file) {
+            $name = $file->getRelativePathname();
+            $name = str_replace('.json', '', $name);
+            $name = str_replace('_', ' ', $name);
+
+            $graphs[] = array(
+                'name' => $name,
+                'file' => 'data/' . $file->getRelativePathname(),
+            );
+        }
+
+        return $graphs;
     }
 }
