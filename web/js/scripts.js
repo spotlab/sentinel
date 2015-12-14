@@ -1,39 +1,41 @@
 $(function () {
 
-    // Init call
-    $('.graphs').each(function(){
-        var container = $(this);
-        var json = container.attr('data-json');
+    // Sound
+    $('body')
+        .append('<div id="sound"></div>')
+        .find('.graphs').each(function(){
+            var container = $(this);
+            var json = container.attr('data-json');
 
-        var lastPing = {};
-        var seriesOptions = [];
+            var lastPing = {};
+            var seriesOptions = [];
 
-        $.getJSON(json, function(data_load) {
-            _.each(data_load.config, function(serie, website){
-                seriesOptions.push({
-                    name: website,
-                    dataGrouping: {
-                        approximation: "high"
-                    },
-                    data: (function() {
-                        var data = [];
-                        _.each(serie, function(val, key){
-                            data.push({
-                                x: moment(val.date, 'X').toDate().getTime(),
-                                y: val.total_time,
+            $.getJSON(json, function(data_load) {
+                _.each(data_load.config, function(serie, website){
+                    seriesOptions.push({
+                        name: website,
+                        dataGrouping: {
+                            approximation: "high"
+                        },
+                        data: (function() {
+                            var data = [];
+                            _.each(serie, function(val, key){
+                                data.push({
+                                    x: moment(val.date, 'X').toDate().getTime(),
+                                    y: val.total_time,
+                                });
+                                lastPing[website] = val.date;
                             });
-                            lastPing[website] = val.date;
-                        });
-                        return data;
-                    })(),
-                    turboThreshold: 0
+                            return data;
+                        })(),
+                        turboThreshold: 0
+                    });
                 });
-            });
 
-            createAlarm(container, data_load);
-            createChart(container, json, lastPing, seriesOptions);
+                createAlarm(container, data_load);
+                createChart(container, json, lastPing, seriesOptions);
+            });
         });
-    });
 
     // create the chart when all data is loaded
     createChart = function (container, json, lastPing, seriesOptions) {
@@ -139,15 +141,15 @@ $(function () {
         var icon = container.find('.icon');
         var legend = container.find('.legend');
 
-        // .html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
-
         // Add Alarm
         if(data_load.status != 200) {
             icon.removeClass().addClass('icon status_error');
             legend.find('.title').html('Erreur').end().find('.data').html(data_load.status);
+            updateSound(true);
         } else if(data_load.average > 2) {
             icon.removeClass().addClass('icon average_error');
             legend.find('.title').html('Temps moyen').end().find('.data').html(data_load.average + 's');
+            updateSound(true);
         } else {
             if(data_load.average < 1) {
                 average = (data_load.average*1000) + 'ms';
@@ -157,6 +159,15 @@ $(function () {
 
             icon.removeClass().addClass('icon good');
             legend.find('.title').html('Temps moyen').end().find('.data').html(average);
+            updateSound(false);
+        }
+    };
+
+    updateSound = function (flag) {
+        if (flag) {
+            $('#sound').html('<audio autoplay><source src="sound/alarm.mp3"></audio>');
+        } else {
+            $('#sound').empty();
         }
     };
 
