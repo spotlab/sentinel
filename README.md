@@ -56,6 +56,12 @@ websites:
 bin/sentinel ping websites.yml
 ```
 
+#### Start php server
+
+```
+php -S localhost:8001 -t web
+```
+
 ## Contributing
 
 Format all code to PHP-FIG standards.
