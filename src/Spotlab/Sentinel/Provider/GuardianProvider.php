@@ -45,7 +45,6 @@ class GuardianProvider implements ServiceProviderInterface, ControllerProviderIn
     {
         $app->register(new TwigServiceProvider(), array('twig.path' => $app['sentinel.twig.path']));
         $app->mount('/', $this->connect($app));
-        $app->mount('/ping', $this->connect($app));
     }
 
     /**
