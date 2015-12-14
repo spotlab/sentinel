@@ -1,7 +1,12 @@
-# BEGIN Cache-Control Headers
 <ifmodule mod_headers.c>
     <filesmatch "\\.(json)$">
         Header set Cache-Control "no-cache, max-age=0, private"
     </filesmatch>
 </ifmodule>
-# END Cache-Control Headers
+
+<IfModule mod_rewrite.c>
+    Options -MultiViews
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
