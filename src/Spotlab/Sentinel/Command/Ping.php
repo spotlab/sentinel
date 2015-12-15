@@ -91,7 +91,16 @@ class Ping extends Command
                 );
             } else {
                 $output->write(curl_error($ch));
+                $total_time = 60;
+                $http_code = 999;
             }
+
+            // Add Data
+            $data[$line][] = array(
+                'date' => $now,
+                'total_time' => $total_time,
+                'http_code' => $http_code,
+            );
 
             // Fermeture du gestionnaire
             curl_close($ch);
