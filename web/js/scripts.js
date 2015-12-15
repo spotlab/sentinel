@@ -144,6 +144,7 @@ $(function () {
         // Add Alarm
         if(data_load.status != 200) {
             icon.removeClass().addClass('icon status_error');
+            if(data_load.status == 999) data_load.status = 'Timeout';
             legend.find('.title').html('Erreur').end().find('.data').html(data_load.status);
             updateSound(true);
         } else if(data_load.average > 2) {
