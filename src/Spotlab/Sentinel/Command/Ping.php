@@ -82,13 +82,6 @@ class Ping extends Command
                 if ($http_code >= 400) {
                     $total_time = 0;
                 }
-
-                // Add Data
-                $data[$line][] = array(
-                    'date' => $now,
-                    'total_time' => $total_time,
-                    'http_code' => $http_code,
-                );
             } else {
                 $output->write(curl_error($ch));
                 $total_time = 60;

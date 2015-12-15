@@ -78,14 +78,14 @@ class Guardian
 
         // Average calcul
         $calc = array();
-        $status = 200;
         foreach ($alarm_data as $website => $entry) {
             foreach ($entry as $key => $val) {
                 $calc[] = $val['total_time'];
-                $status = ($val['http_code'] > 400 || $status != 200) ? $val['http_code'] : 200;
+                $status[] = $val['http_code'];
             }
         }
         $average = round(array_sum($calc) / count($calc) * 100) / 100;
+        $status = max($status);
 
         // Formated date
         $format_data = array();
