@@ -64,7 +64,7 @@ class Ping extends Command
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HEADER, false);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 20);
             if(!empty($config['method']) && $config['method'] == 'POST') curl_setopt($ch, CURLOPT_POST, true);
             if(!empty($config['header'])) curl_setopt($ch, CURLOPT_HTTPHEADER, $config['header']);
             if(!empty($config['content'])) curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($config['content']));
@@ -73,19 +73,22 @@ class Ping extends Command
             curl_exec($ch);
 
             // Vérification si une erreur est survenue
+            $error = '';
             if(!curl_errno($ch)) {
                 $total_time = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
                 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                $output->write('La requête a mis ' . $total_time . ' secondes (' . $http_code . ')');
+                $output->write($total_time . 's (' . $http_code . ')');
 
-                // if http_code error
+                // Failed if 404, 500, ...
                 if ($http_code >= 400) {
-                    $total_time = 0;
+                    $total_time = null;
+                    $error = $http_code;
                 }
             } else {
-                $output->write(curl_error($ch));
-                $total_time = 60;
+                $error = curl_error($ch);
+                $total_time = null;
                 $http_code = 999;
+                $output->write($error);
             }
 
             // Add Data
@@ -93,6 +96,7 @@ class Ping extends Command
                 'date' => $now,
                 'total_time' => $total_time,
                 'http_code' => $http_code,
+                'error' => $error
             );
 
             // Fermeture du gestionnaire
