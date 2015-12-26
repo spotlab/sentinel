@@ -38,7 +38,7 @@ class Ping extends Command
         // Create Guzzle CLient
         $client = new Client();
 
-        // // Create Database
+        // Create Database
         $this->db = new SQLiteDatabase();
 
         // Get Projects
@@ -51,8 +51,6 @@ class Ping extends Command
 
         foreach ($projects as $project_name => $project) {
             foreach ($project['series'] as $serie_name => $serie) {
-                $id_serie = $project_name . '_' . $serie_name;
-
                 // Get Options
                 $options = array();
                 $options['future'] = true;
@@ -66,7 +64,7 @@ class Ping extends Command
                 // Init Ping Object
                 $ping = array();
                 $ping['project'] = $project_name;
-                $ping['serie'] = $id_serie;
+                $ping['serie'] = $serie_name;
                 $ping['ping_date'] = $now;
 
                 // Start Guzzle Requests
@@ -83,13 +81,16 @@ class Ping extends Command
                         $ping['error'] = false;
 
                         // Insert Ping on Database
-                        $this->db->insert($ping);
-                        $output->writeln(
-                            sprintf('SUCCESS %s > %s <info>%s</info>',
-                            $ping['project'],
-                            $ping['serie'],
-                            $time)
-                        );
+                        if($this->db->insert($ping)){
+                            $output->writeln(
+                                sprintf('SUCCESS %s > %s <info>%s</info>',
+                                $ping['project'],
+                                $ping['serie'],
+                                $time)
+                            );
+                        } else {
+                            throw new \Exception('Database insert failed', 0);
+                        }
                     },
                     function ($error) use ($output, $ping, $time_start)  {
                         $time_end = microtime(true);
@@ -105,13 +106,16 @@ class Ping extends Command
                         }
 
                         // Insert Ping on Database
-                        $this->db->insert($ping);
-                        $output->writeln(
-                            sprintf('FAILED %s > %s <error>%s</error>',
-                            $ping['project'],
-                            $ping['serie'],
-                            $error->getMessage())
-                        );
+                        if($this->db->insert($ping)){
+                            $output->writeln(
+                                sprintf('FAILED %s > %s <error>%s</error>',
+                                $ping['project'],
+                                $ping['serie'],
+                                $error->getMessage())
+                            );
+                        } else {
+                            throw new \Exception('Database insert failed', 0);
+                        }
                         throw $error;
                     }
                 );

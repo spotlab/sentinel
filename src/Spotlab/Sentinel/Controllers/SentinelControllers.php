@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Spotlab\Sentinel\Services\ConfigServiceProvider;
+use Spotlab\Sentinel\Services\SQLiteDatabase;
 
 
 /**
@@ -18,7 +19,7 @@ use Spotlab\Sentinel\Services\ConfigServiceProvider;
  */
 class SentinelControllers implements ServiceProviderInterface, ControllerProviderInterface
 {
-    private $client;
+    private $db;
 
     /**
      * Registers services on the given app.
@@ -51,6 +52,9 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         $config = new ConfigServiceProvider();
         $app['sentinel.projects'] = $config->getProjects();
         $app['sentinel.series'] = $config->getSeries();
+
+        // Create Database
+        $this->db = new SQLiteDatabase();
     }
 
     /**
@@ -76,18 +80,23 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         });
 
         // Ping status
-        $controllers->match('/json/{serie}/{dashboard}', function (Request $request) use ($app) {
-            $serie = $request->get('serie');
+        $controllers->match('/api/{project}/{serie}', function (Request $request) use ($app) {
 
+            // Get data from Database with GET Parameter
+            if($request->get('serie')) {
+                $response = new JsonResponse($this->db->findSerie(
+                    $request->get('project'), $request->get('serie')
+                ));
+            } else {
+                $response = new JsonResponse($this->db->findProjectSeries(
+                    $request->get('project')
+                ));
+            }
 
-
-            $return = array();
-
-            $response = new JsonResponse($return);
             return $response;
         })
         ->assert('dashboard', 'dashboard')
-        ->assert('serie', '[a-z]+')
+        ->value('serie', FALSE)
         ->value('dashboard', FALSE);
 
         return $controllers;

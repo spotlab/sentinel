@@ -11,18 +11,17 @@ class ConfigServiceProvider
 
     public function __construct()
     {
-        $config_file = __DIR__ . '/../../../../config/index.yml';
+        $config_dir = __DIR__ . '/../../../../config/';
+        $config_file = $config_dir . 'index.yml';
 
         // Analysing config file
         if (file_exists($config_file)) {
             $this->config = Yaml::parse($config_file);
-            $this->projects = $this->findProjects($this->config);
+            $this->projects = $this->findProjects($this->config, $config_dir);
         } else {
             throw new \Exception('Config file does not exists', 0);
         }
     }
-
-
 
     /**
      * @return array $return
@@ -59,7 +58,7 @@ class ConfigServiceProvider
     /**
      * @return array $return
      */
-    private function findProjects($config, $parent = '')
+    private function findProjects($config, $config_dir, $parent = '')
     {
         $return = array();
         $parent = (empty($parent)) ? $parent : $parent . '_';
@@ -68,14 +67,15 @@ class ConfigServiceProvider
             if ($key == 'projects') {
                 foreach ($value as $name => $project) {
                     if (!isset($project['projects'])) {
-                        if(file_exists($project['series'])) {
+                        $serie_file = $config_dir . $project['series'];
+                        if(file_exists($serie_file)) {
                             $return[$parent.$name]['title'] = $project['title'];
-                            $return[$parent.$name] += Yaml::parse($project['series']);
+                            $return[$parent.$name] += Yaml::parse($serie_file);
                         } else {
-                            throw new \Exception('Series file "'. $project['series'] .'" does not exists', 0);
+                            throw new \Exception('Series file "'. $serie_file .'" does not exists', 0);
                         }
                     } else {
-                        $return += $this->findProjects($project, $name);
+                        $return += $this->findProjects($project, $config_dir, $name);
                     }
                 }
             }

@@ -76,6 +76,55 @@ class SQLiteDatabase extends \SQLite3
         }
 
         $query = 'INSERT INTO sentinel (' . implode(',', $fields) . ') VALUES (' . implode(',', $values) . ')';
-        $this->exec($query);
+        return $this->exec($query);
+    }
+
+    /**
+     * [init description]
+     * @return [type] [description]
+     */
+    public function findProjectSeries($project)
+    {
+        $return = array();
+
+        // Send query
+        $statement = $this->prepare('
+            SELECT * FROM sentinel
+            WHERE project = :project
+            ORDER BY ping_date
+        ');
+        $statement->bindValue(':project', $project);
+        $results = $statement->execute();
+
+        while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
+            $return[$row['serie']][] = $row;
+        }
+
+        return $return;
+    }
+
+    /**
+     * [init description]
+     * @return [type] [description]
+     */
+    public function findSerie($project, $serie)
+    {
+        $return = array();
+
+        // Send query
+        $statement = $this->prepare('
+            SELECT * FROM sentinel
+            WHERE project = :project AND serie = :serie
+            ORDER BY ping_date
+        ');
+        $statement->bindValue(':project', $project);
+        $statement->bindValue(':serie', $serie);
+        $results = $statement->execute();
+
+        while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
+            $return[] = $row;
+        }
+
+        return $return;
     }
 }
