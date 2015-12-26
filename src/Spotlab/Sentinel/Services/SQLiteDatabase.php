@@ -83,21 +83,29 @@ class SQLiteDatabase extends \SQLite3
      * [init description]
      * @return [type] [description]
      */
-    public function findProjectSeries($project)
+    public function findProjectSeries($project, $group = true)
     {
         $return = array();
+
+        // Set max date (1 week max)
+        $max_date = time() - 604800;
 
         // Send query
         $statement = $this->prepare('
             SELECT * FROM sentinel
-            WHERE project = :project
+            WHERE project = :project AND ping_date >= :max_date
             ORDER BY ping_date
         ');
         $statement->bindValue(':project', $project);
+        $statement->bindValue(':max_date', $max_date);
         $results = $statement->execute();
 
         while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
-            $return[$row['serie']][] = $row;
+            if($group) {
+                $return[$row['serie']][] = $row;
+            } else {
+                $return[] = $row;
+            }
         }
 
         return $return;
@@ -123,6 +131,49 @@ class SQLiteDatabase extends \SQLite3
 
         while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
             $return[] = $row;
+        }
+
+        return $return;
+    }
+
+    /**
+     * [init description]
+     * @return [type] [description]
+     */
+    public function findProjectAverage($project)
+    {
+        $return = array();
+
+        // Get Data
+        $data = $this->findProjectSeries($project, $group = false);
+
+        // Set duration
+        $durations = array();
+        $durations['one_minute'] = time() - 60;
+        $durations['six_minutes'] = time() - (6 * 60);
+        $durations['half_hour'] = time() - (30 * 60);
+        $durations['one_hour'] = time() - 3600;
+        $durations['six_hours'] = time() - (5 * 3600);
+        $durations['one_day'] = time() - (24 * 3600);
+        $durations['one_week'] = time() - (7 * 24 * 3600);
+
+        $calc = array();
+        foreach ($data as $val) {
+            foreach ($durations as $key => $time) {
+                if(!isset($calc[$key])) {
+                    $calc[$key]['average'] = 0;
+                    $calc[$key]['count'] = 0;
+                }
+
+                if($val['ping_date'] >= $time) {
+                    $calc[$key]['average'] += $val['ping_time'];
+                    $calc[$key]['count']++;
+                }
+            }
+        }
+
+        foreach ($calc as $key => $val) {
+            $return[$key] = $val['average'] / $val['count'];
         }
 
         return $return;

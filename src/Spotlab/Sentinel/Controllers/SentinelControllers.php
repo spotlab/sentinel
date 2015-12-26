@@ -79,8 +79,8 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
 
         });
 
-        // Ping status
-        $controllers->match('/api/{project}/{serie}', function (Request $request) use ($app) {
+        // Series Data
+        $controllers->match('/api/content/{project}/{serie}', function (Request $request) use ($app) {
 
             // Get data from Database with GET Parameter
             if($request->get('serie')) {
@@ -98,6 +98,17 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         ->assert('dashboard', 'dashboard')
         ->value('serie', FALSE)
         ->value('dashboard', FALSE);
+
+        // Average Data
+        $controllers->match('/api/average/{project}', function (Request $request) use ($app) {
+
+            // Get data from Database with GET Parameter
+            $response = new JsonResponse($this->db->findProjectAverage(
+                $request->get('project')
+            ));
+
+            return $response;
+        });
 
         return $controllers;
     }
