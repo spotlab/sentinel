@@ -150,11 +150,11 @@ class SQLiteDatabase extends \SQLite3
         // Set duration
         $durations = array();
         $durations['two_minutes'] = time() - (2 * 60);
-        $durations['ten_minutes'] = time() - (10 * 60);
         $durations['half_hour'] = time() - (30 * 60);
         $durations['one_hour'] = time() - 3600;
-        $durations['six_hours'] = time() - (5 * 3600);
+        $durations['half_day'] = time() - (12 * 3600);
         $durations['one_day'] = time() - (24 * 3600);
+        $durations['half_week'] = time() - (3 * 24 * 3600);
         $durations['one_week'] = time() - (7 * 24 * 3600);
 
         $calc = array();
