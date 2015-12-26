@@ -162,22 +162,30 @@ class SQLiteDatabase extends \SQLite3
             foreach ($durations as $key => $time) {
                 if(!isset($calc[$key])) {
                     $calc[$key]['average'] = 0;
-                    $calc[$key]['count'] = 0;
+                    $calc[$key]['success_count'] = 0;
+                    $calc[$key]['failed_count'] = 0;
                 }
 
-                if($val['ping_date'] >= $time) {
+                if($val['ping_date'] >= $time && $val['http_status'] == 200) {
                     $calc[$key]['average'] += $val['ping_time'];
-                    $calc[$key]['count']++;
+                    if($val['http_status'] == 200) {
+                        $calc[$key]['success_count']++;
+                    } else {
+                        $calc[$key]['failed_count']++;
+                    }
                 }
             }
         }
 
         // Division to get average
         foreach ($calc as $key => $val) {
-            if($val['average'] == 0 || $val['average'] == 0) {
-                $return[$key] = 0;
-            } else {
-                $return[$key] = $val['average'] / $val['count'];
+            if($val['average'] != 0 && $val['success_count'] != 0) {
+                $return['average'][$key] = $val['average'] / $val['success_count'];
+            }
+
+            $total_count = $val['success_count'] + $val['failed_count'];
+            if($total_count != 0) {
+                $return['fiability'][$key] = round(($val['success_count'] / $total_count) * 100);
             }
         }
 
