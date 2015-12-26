@@ -4,7 +4,7 @@ namespace Spotlab\Sentinel\Services;
 
 use Symfony\Component\Yaml\Yaml;
 
-class ConfigProvider
+class ConfigServiceProvider
 {
     protected $config;
     protected $projects;
@@ -32,8 +32,28 @@ class ConfigProvider
         if(!empty($this->projects)) {
             return $this->projects;
         } else {
-            throw new \Exception('No projects find on config file', 0);
+            throw new \Exception('No projects found on config file', 0);
         }
+    }
+
+    /**
+     * @return array $return
+     */
+    public function getSeries()
+    {
+        $series = array();
+        $projects = $this->getProjects();
+        foreach ($projects as $project_name => $project) {
+            foreach ($project['series'] as $serie_name => $serie) {
+                $series[] = $project_name . '_' . $serie_name;
+            }
+        }
+
+        if(empty($series)) {
+            throw new \Exception('No series found on config file', 0);
+        }
+
+        return $series;
     }
 
     /**

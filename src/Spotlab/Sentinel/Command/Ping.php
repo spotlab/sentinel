@@ -8,7 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Spotlab\Sentinel\Services\ConfigProvider;
+use Spotlab\Sentinel\Services\ConfigServiceProvider;
 use Spotlab\Sentinel\Services\SQLiteDatabase;
 
 /**
@@ -42,8 +42,8 @@ class Ping extends Command
         $this->db = new SQLiteDatabase();
 
         // Get Projects
-        $configProvider = new ConfigProvider();
-        $projects = $configProvider->getProjects();
+        $config = new ConfigServiceProvider();
+        $projects = $config->getProjects();
         $output->writeln(sprintf('FIND : <comment>%s projects</comment>', count($projects)));
 
         // Register time
@@ -51,6 +51,8 @@ class Ping extends Command
 
         foreach ($projects as $project_name => $project) {
             foreach ($project['series'] as $serie_name => $serie) {
+                $id_serie = $project_name . '_' . $serie_name;
+
                 // Get Options
                 $options = array();
                 $options['future'] = true;
@@ -64,7 +66,7 @@ class Ping extends Command
                 // Init Ping Object
                 $ping = array();
                 $ping['project'] = $project_name;
-                $ping['serie'] = $serie_name;
+                $ping['serie'] = $id_serie;
                 $ping['ping_date'] = $now;
 
                 // Start Guzzle Requests

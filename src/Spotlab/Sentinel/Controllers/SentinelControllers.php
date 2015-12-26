@@ -10,7 +10,7 @@ use Silex\Provider\TwigServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Spotlab\Sentinel\Services\ConfigProvider;
+use Spotlab\Sentinel\Services\ConfigServiceProvider;
 
 
 /**
@@ -48,8 +48,9 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         $app->mount('/', $this->connect($app));
 
         // Get Projects
-        $configProvider = new ConfigProvider();
-        $app['sentinel.projects'] = $configProvider->getProjects();
+        $config = new ConfigServiceProvider();
+        $app['sentinel.projects'] = $config->getProjects();
+        $app['sentinel.series'] = $config->getSeries();
     }
 
     /**
@@ -76,10 +77,10 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
 
         // Ping status
         $controllers->match('/json/{serie}/{dashboard}', function (Request $request) use ($app) {
-
-            $tools =
-
             $serie = $request->get('serie');
+
+
+
             $return = array();
 
             $response = new JsonResponse($return);
