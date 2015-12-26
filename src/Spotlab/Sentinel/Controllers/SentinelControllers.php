@@ -1,6 +1,6 @@
 <?php
 
-namespace Spotlab\Sentinel\Provider;
+namespace Spotlab\Sentinel\Controllers;
 
 use Silex\Application;
 use Silex\ControllerCollection;
@@ -11,11 +11,13 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Spotlab\Sentinel\Services\Tools;
+
 
 /**
  * Guardian Provider.
  */
-class SentinelProvider implements ServiceProviderInterface, ControllerProviderInterface
+class SentinelControllers implements ServiceProviderInterface, ControllerProviderInterface
 {
     private $client;
 
@@ -71,6 +73,8 @@ class SentinelProvider implements ServiceProviderInterface, ControllerProviderIn
 
         // Ping status
         $controllers->match('/json/{serie}/{dashboard}', function (Request $request) use ($app) {
+
+            $tools =
 
             $serie = $request->get('serie');
             $return = array();

@@ -14,6 +14,6 @@ $app = new Silex\Application();
 $app['debug'] = true;
 
 // Routing
-$app->register(new Spotlab\Sentinel\Provider\SentinelProvider(), array());
+$app->register(new Spotlab\Sentinel\Controllers\SentinelControllers(), array());
 
 $app->run();

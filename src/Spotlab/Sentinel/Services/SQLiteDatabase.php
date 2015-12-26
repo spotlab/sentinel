@@ -1,6 +1,6 @@
 <?php
 
-namespace Spotlab\Sentinel\Database;
+namespace Spotlab\Sentinel\Services;
 
 /**
  * SQLiteDatabase
@@ -12,7 +12,8 @@ class SQLiteDatabase extends \SQLite3
     function __construct()
     {
         // Database File
-        $this->open(__DIR__ . '/../../../../database/SQLiteSentinel.db');
+        $database = __DIR__ . '/../../../../database/SQLiteSentinel.db';
+        $this->open($database);
 
         // Table structure
         $table = array();
@@ -26,13 +27,16 @@ class SQLiteDatabase extends \SQLite3
         $table['error_log'] = 'TEXT';
 
         $this->table = $table;
+
+        // Create Database if not exist
+        $this->create();
     }
 
     /**
      * [init description]
      * @return [type] [description]
      */
-    public function init()
+    private function create()
     {
         if(!$this){
             throw new \Exception($db->lastErrorMsg(), 0);
