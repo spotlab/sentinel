@@ -2,7 +2,7 @@
 
 namespace Spotlab\Sentinel\Command;
 
-use Spotlab\Sentinel\Tools\Guardian;
+use Spotlab\Sentinel\Services\Tools;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,77 +38,7 @@ class Ping extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        // First step : Analysing config
-        $config_path = $input->getArgument('config');
-        $guardian = new Guardian($config_path);
-        $output->writeln(sprintf('Analysing config file : <info>%s</info>', $config_path));
-        $output->write("\n");
-
-        // Actions for every projects in config
-        $requests = $guardian->getRequests();
-        $data = $guardian->getData();
-
-        // Register time
-        $now = time();
-
-        foreach ($requests as $line => $config) {
-
-            $output->writeln(sprintf('> Start : <info>%s</info>', $line));
-            $output->writeln('------------------------------');
-
-            // Création d'un gestionnaire curl
-            $ch = curl_init();
-
-            // Configuration de l'URL et d'autres options
-            curl_setopt($ch, CURLOPT_URL, $config['url']);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HEADER, false);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-            if(!empty($config['method']) && $config['method'] == 'POST') curl_setopt($ch, CURLOPT_POST, true);
-            if(!empty($config['header'])) curl_setopt($ch, CURLOPT_HTTPHEADER, $config['header']);
-            if(!empty($config['content'])) curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($config['content']));
-
-            // // Exécution
-            curl_exec($ch);
-
-            // Vérification si une erreur est survenue
-            $error = '';
-            if(!curl_errno($ch)) {
-                $total_time = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
-                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                $output->write($total_time . 's (' . $http_code . ')');
-
-                // Failed if 404, 500, ...
-                if ($http_code >= 400) {
-                    $total_time = null;
-                    $error = $http_code;
-                }
-            } else {
-                $error = curl_error($ch);
-                $total_time = null;
-                $http_code = 999;
-                $output->write($error);
-            }
-
-            // Add Data
-            $data[$line][] = array(
-                'date' => $now,
-                'total_time' => $total_time,
-                'http_code' => $http_code,
-                'error' => $error
-            );
-
-            // Fermeture du gestionnaire
-            curl_close($ch);
-
-            $output->write("\n\n");
-        }
-
-        // Save date into file
-        $output->writeln('> Save data');
-        $output->writeln('------------------------------');
-        $guardian->setData($data);
-        $output->writeln('Finished : <info>Done</info>');
+        $guardian = new Tools($input->getArgument('config'), $output);
+        $guardian->execute();
     }
 }

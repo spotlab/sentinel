@@ -31,7 +31,7 @@ class GuardianProvider implements ServiceProviderInterface, ControllerProviderIn
     {
         $app['sentinel.name'] = 'Sentinel';
         $app['sentinel.data.json'] = __DIR__ . '/../../../../web/data';
-        $app['sentinel.twig.path'] = __DIR__ . '/../../../../views';
+        $app['sentinel.twig.path'] = __DIR__ . '/../Ressources/views';
     }
 
     /**
