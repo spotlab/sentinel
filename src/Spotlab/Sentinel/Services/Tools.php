@@ -72,7 +72,7 @@ class Tools
                 $ping['project'] = $project_name;
                 $ping['serie'] = $request_name;
                 $ping['ping_date'] = $now;
-                
+
                 // Start Guzzle Requests
                 $time_start = microtime(true);
                 $req = $client->createRequest($request['method'], $request['url'], $options);
@@ -98,6 +98,10 @@ class Tools
                         $ping['ping_time'] = $time;
                         $ping['error'] = true;
                         $ping['error_log'] = $error->getMessage();
+
+                        if($error->getCode() !== 0) {
+                            $ping['http_status'] = $error->getCode();
+                        }
 
                         // Insert Ping on Database
                         $this->db->insert($ping);
