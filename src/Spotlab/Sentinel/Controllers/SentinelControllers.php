@@ -7,11 +7,10 @@ use Silex\ControllerCollection;
 use Silex\ControllerProviderInterface;
 use Silex\ServiceProviderInterface;
 use Silex\Provider\TwigServiceProvider;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Spotlab\Sentinel\Services\Tools;
+use Spotlab\Sentinel\Services\ConfigProvider;
 
 
 /**
@@ -47,6 +46,10 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
     {
         $app->register(new TwigServiceProvider(), array('twig.path' => $app['sentinel.twig.path']));
         $app->mount('/', $this->connect($app));
+
+        // Get Projects
+        $configProvider = new ConfigProvider();
+        $app['sentinel.projects'] = $configProvider->getProjects();
     }
 
     /**

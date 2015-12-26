@@ -48,11 +48,11 @@ class ConfigProvider
             if ($key == 'projects') {
                 foreach ($value as $name => $project) {
                     if (!isset($project['projects'])) {
-                        if(file_exists($project['requests'])) {
+                        if(file_exists($project['series'])) {
                             $return[$parent.$name]['title'] = $project['title'];
-                            $return[$parent.$name] += Yaml::parse($project['requests']);
+                            $return[$parent.$name] += Yaml::parse($project['series']);
                         } else {
-                            throw new \Exception('Requests file "'. $project['requests'] .'" does not exists', 0);
+                            throw new \Exception('Series file "'. $project['series'] .'" does not exists', 0);
                         }
                     } else {
                         $return += $this->findProjects($project, $name);

@@ -50,11 +50,7 @@ class Ping extends Command
         $now = time();
 
         foreach ($projects as $project_name => $project) {
-            //$this->output->writeln(sprintf('> Start project <info>%s</info>', $project_name));
-            foreach ($project['requests'] as $request_name => $request) {
-                $serie_name = $project_name . '_' . $request_name;
-                //$this->output->writeln(sprintf('> Start serie <info>%s</info>', $serie_name));
-
+            foreach ($project['series'] as $serie_name => $serie) {
                 // Get Options
                 $options = array();
                 $options['future'] = true;
@@ -62,20 +58,20 @@ class Ping extends Command
                 $options['timeout'] = 30;
 
                 // Get Request params
-                if(!empty($request['headers'])) $options['headers'] = $request['headers'];
-                if(!empty($request['body'])) $options['body'] = $request['body'];
+                if(!empty($serie['headers'])) $options['headers'] = $serie['headers'];
+                if(!empty($serie['body'])) $options['body'] = $serie['body'];
 
                 // Init Ping Object
                 $ping = array();
                 $ping['project'] = $project_name;
-                $ping['serie'] = $request_name;
+                $ping['serie'] = $serie_name;
                 $ping['ping_date'] = $now;
 
                 // Start Guzzle Requests
                 $time_start = microtime(true);
-                $req = $client->createRequest($request['method'], $request['url'], $options);
+                $req = $client->createRequest($serie['method'], $serie['url'], $options);
                 $client->send($req)->then(
-                    function ($response) use ($output, $ping, $serie_name, $time_start) {
+                    function ($response) use ($output, $ping, $time_start) {
                         $time_end = microtime(true);
                         $time = $time_end - $time_start;
 
@@ -86,9 +82,14 @@ class Ping extends Command
 
                         // Insert Ping on Database
                         $this->db->insert($ping);
-                        $output->writeln(sprintf('SUCCESS %s <info>%s</info>', $serie_name, $time));
+                        $output->writeln(
+                            sprintf('SUCCESS %s > %s <info>%s</info>',
+                            $ping['project'],
+                            $ping['serie'],
+                            $time)
+                        );
                     },
-                    function ($error) use ($output, $ping, $serie_name, $time_start)  {
+                    function ($error) use ($output, $ping, $time_start)  {
                         $time_end = microtime(true);
                         $time = $time_end - $time_start;
 
@@ -103,7 +104,12 @@ class Ping extends Command
 
                         // Insert Ping on Database
                         $this->db->insert($ping);
-                        $output->writeln(sprintf('FAILED %s <error>%s</error>', $serie_name, $error->getMessage()));
+                        $output->writeln(
+                            sprintf('FAILED %s > %s <error>%s</error>',
+                            $ping['project'],
+                            $ping['serie'],
+                            $error->getMessage())
+                        );
                         throw $error;
                     }
                 );
