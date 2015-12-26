@@ -149,8 +149,8 @@ class SQLiteDatabase extends \SQLite3
 
         // Set duration
         $durations = array();
-        $durations['one_minute'] = time() - 60;
-        $durations['six_minutes'] = time() - (6 * 60);
+        $durations['two_minutes'] = time() - (2 * 60);
+        $durations['ten_minutes'] = time() - (10 * 60);
         $durations['half_hour'] = time() - (30 * 60);
         $durations['one_hour'] = time() - 3600;
         $durations['six_hours'] = time() - (5 * 3600);
@@ -172,8 +172,13 @@ class SQLiteDatabase extends \SQLite3
             }
         }
 
+        // Division to get average
         foreach ($calc as $key => $val) {
-            $return[$key] = $val['average'] / $val['count'];
+            if($val['average'] == 0 || $val['average'] == 0) {
+                $return[$key] = 0;
+            } else {
+                $return[$key] = $val['average'] / $val['count'];
+            }
         }
 
         return $return;
