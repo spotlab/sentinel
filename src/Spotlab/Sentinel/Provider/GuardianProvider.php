@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 /**
  * Guardian Provider.
  */
-class GuardianProvider implements ServiceProviderInterface, ControllerProviderInterface
+class SentinelProvider implements ServiceProviderInterface, ControllerProviderInterface
 {
     private $client;
 
@@ -62,63 +62,26 @@ class GuardianProvider implements ServiceProviderInterface, ControllerProviderIn
         // Graphs display
         $controllers->match('/', function (Request $request) use ($app) {
 
-            $graphs = $this->getGraphs($app);
-
             return $app['twig']->render('index.html.twig', array(
                 'title' => $app['sentinel.name'],
-                'graphs' => $graphs
+                'graphs' => array()
             ));
 
         });
 
         // Ping status
-        $controllers->match('/ping', function (Request $request) use ($app) {
+        $controllers->match('/json/{serie}/{dashboard}', function (Request $request) use ($app) {
 
-            $graphs = $this->getGraphs($app);
-            $status = 200;
+            $serie = $request->get('serie');
             $return = array();
 
-            foreach ($graphs as $key => $val) {
-                $data = file_get_contents($val['file']);
-                $data = json_decode($data, true);
-                $return[$key]['name'] = $val['name'];
-                $return[$key]['status'] = $data['status'];
-                $return[$key]['average'] = $data['average'];
-
-                if($data['status'] >= 400) {
-                    $status = $data['status'];
-                }
-            }
-
             $response = new JsonResponse($return);
-            $response->setStatusCode($status);
             return $response;
-        });
+        })
+        ->assert('dashboard', 'dashboard')
+        ->assert('serie', '[a-z]+')
+        ->value('dashboard', FALSE);
 
         return $controllers;
-    }
-
-    private function getGraphs(Application $app)
-    {
-        $finder = new Finder();
-        $finder
-            ->files()
-            ->name('*.json')
-            ->sortByName()
-            ->in($app['sentinel.data.json']);
-
-        $graphs = array();
-        foreach ($finder as $file) {
-            $name = $file->getRelativePathname();
-            $name = str_replace('.json', '', $name);
-            $name = str_replace('_', ' ', $name);
-
-            $graphs[] = array(
-                'name' => $name,
-                'file' => 'data/' . $file->getRelativePathname(),
-            );
-        }
-
-        return $graphs;
     }
 }
