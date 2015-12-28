@@ -166,12 +166,12 @@ class SQLiteDatabase extends \SQLite3
                     $calc[$key]['failed_count'] = 0;
                 }
 
-                if($val['ping_date'] >= $time && $val['http_status'] == 200) {
+                if($val['ping_date'] >= $time) {
                     $calc[$key]['average'] += $val['ping_time'];
-                    if($val['http_status'] == 200) {
-                        $calc[$key]['success_count']++;
-                    } else {
+                    if($val['error']) {
                         $calc[$key]['failed_count']++;
+                    } else {
+                        $calc[$key]['success_count']++;
                     }
                 }
             }
@@ -185,7 +185,7 @@ class SQLiteDatabase extends \SQLite3
 
             $total_count = $val['success_count'] + $val['failed_count'];
             if($total_count != 0) {
-                $return['fiability'][$key] = round(($val['success_count'] / $total_count) * 100);
+                $return['quality_of_service'][$key] = round(($val['success_count'] / $total_count) * 100);
             }
         }
 
