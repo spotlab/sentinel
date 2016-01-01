@@ -1,0 +1,75 @@
+body {
+    font-family: "Roboto","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #CFD2DA;
+    background-color: #252830;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.sidebar {
+    header {
+        position: relative;
+        margin-bottom: 50px;
+        min-height: 75px;
+        background: url(../img/logo.png) no-repeat;
+        background-size: contain;
+
+        h1 {
+            display: none;
+        }
+
+        p.company {
+            font-family: 'Poiret One', cursive;
+            font-size: 1.2em;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+    }
+
+    a {
+        color: #CFD2DA;
+        text-decoration: none;
+
+        &:hover {
+            background: #51586A;
+        }
+    }
+
+    .panel-home {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #51586A;
+    }
+
+    .panel-group {
+        .panel {
+            border: none;
+            background: none;
+
+            .panel-heading {
+                border: none;
+                background: none;
+                padding: 10px 0;
+
+                .panel-title {
+                    font-size: 0.8em;
+                    font-weight: normal;
+                    letter-spacing: 1px;
+                    color: #51586A;
+                    text-transform: uppercase;
+                }
+            }
+            ul {
+                padding: 0 0 0 25px;
+
+                li {
+                    font-weight: 300;
+                    list-style: circle;
+                }
+            }
+        }
+    }
+}
