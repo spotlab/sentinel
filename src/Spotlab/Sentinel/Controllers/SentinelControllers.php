@@ -50,6 +50,7 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
 
         // Get Projects
         $config = new ConfigServiceProvider();
+        $app['sentinel.config'] = $config->getConfig();
         $app['sentinel.projects'] = $config->getProjects();
         $app['sentinel.series'] = $config->getSeries();
 
@@ -74,7 +75,8 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
 
             return $app['twig']->render('index.html.twig', array(
                 'title' => $app['sentinel.name'],
-                'graphs' => array()
+                'parameters' => $app['sentinel.config']['parameters'],
+                'projects' => $app['sentinel.config']['projects']
             ));
 
         });

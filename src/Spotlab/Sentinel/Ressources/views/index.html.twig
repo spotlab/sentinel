@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="author" content="Spotlab">
+    <meta name="author" content="Léo POIROUX | Spotlab | {{ parameters.company }}">
     <meta http-equiv="refresh" content="3600">
     <link rel="icon" href="{{ app.request.basepath }}/img/favicon.ico">
 
-    <title>{{ title }}</title>
+    <title>{{ title }} | {{ parameters.company }}</title>
 
     <!-- Bootstrap core CSS -->
     <link href="{{ app.request.basepath }}/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -30,89 +30,69 @@
 
             <div class="col-md-2 sidebar">
                 <header class="brand">
-                    <h1>Sentinel</h1>
-                    <p class="company">by Raccourci</p>
+                    <h1>{{ title }}</h1>
+                    <p class="company">by {{ parameters.company }}</p>
                 </header>
 
                 <nav class="nav">
                     <div class="panel-home">
-                        <a href="#" class="active">
+                        <a href="{{ app.request.basepath }}" class="active">
                             <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
                             Tableau de bord
                         </a>
                     </div>
 
                     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                        {% for key, project in projects %}
                         <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingOne">
+                            <div class="panel-heading" role="tab" id="heading{{ key }}">
                                 <h4 class="panel-title">
-                                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                        Drupal 7
+                                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ key }}" aria-expanded="true" aria-controls="collapse{{ key }}">
+                                        {{ project.title }}
                                     </a>
                                 </h4>
                             </div>
                             <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
                                 <ul>
-                                    <li class="active"><a href="">Socialwall</a></li>
-                                    <li><a href="">Socialwall</a></li>
-                                    <li><a href="">Socialwall</a></li>
+                                    {% for subkey, subproject in project.projects %}
+                                    <li><a href="{{ app.request.basepath }}/{{ key }}/{{ subkey }}">{{ subproject.title }}</a></li>
+                                    {% endfor %}
                                 </ul>
                             </div>
                         </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingTwo">
-                                <h4 class="panel-title">
-                                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                        Drupal 6
-                                    </a>
-                                </h4>
-                            </div>
-                            <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                                <ul>
-                                    <li><a href="">Socialwall</a></li>
-                                    <li><a href="">Socialwall</a></li>
-                                    <li><a href="">Socialwall</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingThree">
-                                <h4 class="panel-title">
-                                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                        API
-                                    </a>
-                                </h4>
-                            </div>
-                            <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                                <ul>
-                                    <li><a href="">Socialwall</a></li>
-                                    <li><a href="">Socialwall</a></li>
-                                    <li><a href="">Socialwall</a></li>
-                                </ul>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </nav>
             </div>
 
             <div class="col-md-10 main">
+                <header>
+                    <h2 class="page-title">Tableau de bord</h2>
+                </header>
 
+                <div class="row">
+                {% for key, project in projects %}
+                    {% for subkey, subproject in project.projects %}
+                        <div class="col-md-4 status-badge" data-path="{{ app.request.basepath }}/api/average/{{ key }}/{{ subkey }}" data-project="{{ project.title }}" data-subproject="{{ subproject.title }}"></div>
+                    {% endfor %}
+                {% endfor %}
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- <footer class="footer">
-    <p>&copy; {{ "now"|date("Y") }} Sentinel</p>
-</footer> -->
+    <footer class="footer">
+        <p>&copy; {{ "now"|date("Y") }} {{ title }} by {{ parameters.company }}</p>
+    </footer>
 
-<!-- Bootstrap core JavaScript
-================================================== -->
-<script src="{{ app.request.basepath }}/bower_components/jquery/dist/jquery.min.js"></script>
-<script src="{{ app.request.basepath }}/bower_components/less/dist/less.min.js"></script>
-<script src="{{ app.request.basepath }}/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="{{ app.request.basepath }}/bower_components/lodash/lodash.min.js"></script>
-<script src="{{ app.request.basepath }}/bower_components/moment/min/moment-with-locales.min.js"></script>
-<script src="{{ app.request.basepath }}/bower_components/highstock-release/highstock.js"></script>
-<!-- <script src="{{ app.request.basepath }}/js/scripts.js"></script> -->
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <script src="{{ app.request.basepath }}/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="{{ app.request.basepath }}/bower_components/less/dist/less.min.js"></script>
+    <script src="{{ app.request.basepath }}/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="{{ app.request.basepath }}/bower_components/lodash/lodash.min.js"></script>
+    <script src="{{ app.request.basepath }}/bower_components/moment/min/moment-with-locales.min.js"></script>
+    <script src="{{ app.request.basepath }}/bower_components/highstock-release/highstock.js"></script>
+    <!-- <script src="{{ app.request.basepath }}/js/scripts.js"></script> -->
 </body>
 </html>

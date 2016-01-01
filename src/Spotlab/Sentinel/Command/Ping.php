@@ -43,7 +43,7 @@ class Ping extends Command
 
         // Get Projects
         $config = new ConfigServiceProvider();
-        $projects = $config->getProjects();
+        $projects = $config->getProjects($flat = true);
         $output->writeln(sprintf('FIND : <comment>%s projects</comment>', count($projects)));
 
         // Register time
