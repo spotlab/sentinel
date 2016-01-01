@@ -32,9 +32,10 @@ body {
     a {
         color: #CFD2DA;
         text-decoration: none;
+        outline: none;
 
         &:hover {
-            background: #51586A;
+            color: #CFD2DA;
         }
     }
 
@@ -42,12 +43,34 @@ body {
         margin-bottom: 15px;
         padding-bottom: 15px;
         border-bottom: 1px solid #51586A;
+        text-align: center;
+
+        a {
+            display: block;
+            border-radius: 3px;
+            padding: 5px;
+            width: 100%;
+            .glyphicon {
+                margin-right: 5px;
+            }
+
+            &:hover {
+                background: #51586A;
+                color: #fff;
+            }
+
+            &.active {
+                background: #1CA8DD;
+                color: #252830;
+            }
+        }
     }
 
     .panel-group {
         .panel {
             border: none;
             background: none;
+            box-shadow: none;
 
             .panel-heading {
                 border: none;
@@ -60,14 +83,52 @@ body {
                     letter-spacing: 1px;
                     color: #51586A;
                     text-transform: uppercase;
+
+                    a {
+                        color: #51586A;
+
+                        &:hover {
+                            color: #fff;
+                        }
+                    }
                 }
             }
+
             ul {
-                padding: 0 0 0 25px;
+                padding: 0;
+                list-style: circle;
+                list-style-position: inside;
 
                 li {
-                    font-weight: 300;
                     list-style: circle;
+                    padding: 2px 2px 2px 20px;
+                    border-radius: 3px;
+                    list-style: disc;
+                    list-style-position: inside;
+
+                    &:hover {
+                        background: #51586A;
+
+                        a {
+                            color: #fff;
+                        }
+                    }
+
+                    &.active {
+                        color: #252830;
+                        background: #1CA8DD;
+
+                        a {
+                            color: #252830;
+                        }
+
+                        &:hover {
+                            color: #fff;
+                            a {
+                                color: #fff;
+                            }
+                        }
+                    }
                 }
             }
         }
