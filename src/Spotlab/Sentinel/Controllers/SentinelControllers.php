@@ -71,15 +71,18 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         $controllers = $app['controllers_factory'];
 
         // Graphs display
-        $controllers->match('/', function (Request $request) use ($app) {
+        $controllers->match('/{project}/{serie}', function (Request $request) use ($app) {
 
             return $app['twig']->render('index.html.twig', array(
+                'uri' => $_SERVER['REQUEST_URI'],
                 'title' => $app['sentinel.name'],
                 'parameters' => $app['sentinel.config']['parameters'],
                 'projects' => $app['sentinel.config']['projects']
             ));
 
-        });
+        })
+        ->value('project', FALSE)
+        ->value('serie', FALSE);
 
         // Series Data
         $controllers->match('/api/content/{project}/{serie}', function (Request $request) use ($app) {
@@ -97,9 +100,7 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
 
             return $response;
         })
-        ->assert('dashboard', 'dashboard')
-        ->value('serie', FALSE)
-        ->value('dashboard', FALSE);
+        ->value('serie', FALSE);
 
         // Average Data
         $controllers->match('/api/average/{project}', function (Request $request) use ($app) {

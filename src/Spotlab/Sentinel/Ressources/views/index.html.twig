@@ -36,7 +36,7 @@
 
                 <nav class="nav">
                     <div class="panel-home">
-                        <a href="{{ app.request.basepath }}" class="active">
+                        <a href="{{ app.request.basepath }}/" class="{% if uri == '/' %}active{% endif %}">
                             <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
                             Tableau de bord
                         </a>
@@ -55,7 +55,8 @@
                             <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
                                 <ul>
                                     {% for subkey, subproject in project.projects %}
-                                    <li><a href="{{ app.request.basepath }}/{{ key }}/{{ subkey }}">{{ subproject.title }}</a></li>
+                                    {% set path = '/' ~ key ~ '/' ~ subkey %}
+                                    <li class="{% if uri == path %}active{% endif %}"><a href="{{ app.request.basepath }}{{ path }}">{{ subproject.title }}</a></li>
                                     {% endfor %}
                                 </ul>
                             </div>
@@ -67,7 +68,13 @@
 
             <div class="col-md-10 main">
                 <header>
-                    <h2 class="page-title">Tableau de bord</h2>
+                    <h2 class="page-title">
+                        {% if uri == '/' %}
+                            Tableau de bord
+                        {% else %}
+
+                        {% endif %}
+                    </h2>
                 </header>
 
                 <div class="row">

@@ -1,9 +1,17 @@
+// VARIABLES
+@bgColor: #252830;
+@fontColor: #CFD2DA;
+@fontTitleColor: #51586A;
+@activeColor: #1CA8DD;
+
+// BODY
+
 body {
     font-family: "Roboto","Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 12px;
     line-height: 1.5;
-    color: #CFD2DA;
-    background-color: #252830;
+    color: @fontColor;
+    background-color: @bgColor;
     padding-top: 50px;
     padding-bottom: 50px;
 }
@@ -23,9 +31,9 @@ body {
             z-index: 2;
             display: inline-block;
             padding: 0 15px;
-            color: #51586A;
+            color: @fontTitleColor;
             vertical-align: middle;
-            background: #252830;
+            background: @bgColor;
         }
 
         &::before {
@@ -35,7 +43,7 @@ body {
             content: "";
             width: 100%;
             height: 1px;
-            background-color: #51586A;
+            background-color: @fontTitleColor;
         }
     }
 }
@@ -62,19 +70,19 @@ body {
     }
 
     a {
-        color: #CFD2DA;
+        color: @fontColor;
         text-decoration: none;
         outline: none;
 
         &:hover {
-            color: #CFD2DA;
+            color: @fontColor;
         }
     }
 
     .panel-home {
         margin-bottom: 15px;
         padding-bottom: 15px;
-        border-bottom: 1px solid #51586A;
+        border-bottom: 1px solid @fontTitleColor;
         text-align: center;
 
         a {
@@ -82,18 +90,20 @@ body {
             border-radius: 3px;
             padding: 5px;
             width: 100%;
+            background: darken(@bgColor, 2%);
+
             .glyphicon {
                 margin-right: 5px;
             }
 
             &:hover {
-                background: #51586A;
+                background: @fontTitleColor;
                 color: #fff;
             }
 
             &.active {
-                background: #1CA8DD;
-                color: #252830;
+                background: @activeColor;
+                color: @bgColor;
             }
         }
     }
@@ -113,11 +123,11 @@ body {
                     font-size: 100%;
                     font-weight: normal;
                     letter-spacing: 1px;
-                    color: #51586A;
+                    color: @fontTitleColor;
                     text-transform: uppercase;
 
                     a {
-                        color: #51586A;
+                        color: @fontTitleColor;
 
                         &:hover {
                             color: #fff;
@@ -139,7 +149,7 @@ body {
                     list-style-position: inside;
 
                     &:hover {
-                        background: #51586A;
+                        background: @fontTitleColor;
 
                         a {
                             color: #fff;
@@ -147,11 +157,11 @@ body {
                     }
 
                     &.active {
-                        color: #252830;
-                        background: #1CA8DD;
+                        color: @bgColor;
+                        background: @activeColor;
 
                         a {
-                            color: #252830;
+                            color: @bgColor;
                         }
 
                         &:hover {
@@ -178,6 +188,6 @@ body {
     p {
         text-align: center;
         margin: 0;
-        color: #51586A;
+        color: @fontTitleColor;
     }
 }
