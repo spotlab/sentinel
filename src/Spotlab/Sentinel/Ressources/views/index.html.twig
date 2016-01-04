@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Léo POIROUX | Spotlab | {{ parameters.company }}">
     <meta http-equiv="refresh" content="3600">
-    <link rel="icon" href="{{ app.request.basepath }}/img/favicon.ico">
+    <link rel="icon" href="{{ app.request.basepath }}/assets/img/favicon.ico">
 
     <title>{{ title }} | {{ parameters.company }}</title>
 
@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet" type="text/css">
 
     <!-- Custom styles for this template -->
-    <link href="{{ app.request.basepath }}/css/main.less" rel="stylesheet/less" type="text/css">
+    <link href="{{ app.request.basepath }}/assets/css/main.less" rel="stylesheet/less" type="text/css">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -66,22 +66,21 @@
                 </nav>
             </div>
 
-            <div class="col-md-10 main">
-                <header>
-                    <h2 class="page-title">
-                        {% if uri == '/' %}
-                            Tableau de bord
-                        {% else %}
-
-                        {% endif %}
-                    </h2>
-                </header>
+            <div class="col-md-10 main dashboard">
+                {% if uri == '/' %}
+                <header><h2 class="page-title">Tableau de bord</h2></header>
+                {% endif %}
 
                 <div class="row">
                 {% for key, project in projects %}
-                    {% for subkey, subproject in project.projects %}
-                        <div class="col-md-4 status-badge" data-path="{{ app.request.basepath }}/api/average/{{ key }}/{{ subkey }}" data-project="{{ project.title }}" data-subproject="{{ subproject.title }}"></div>
-                    {% endfor %}
+                {% for subkey, subproject in project.projects %}
+                <div class="col-md-3 status-badge"
+                     data-template="{{ app.request.basepath }}/templates/badge.html"
+                     data-json="{{ app.request.basepath }}/api/average/{{ key }}_{{ subkey }}"
+                     data-project="{{ project.title }}"
+                     data-subproject="{{ subproject.title }}">
+                </div>
+                {% endfor %}
                 {% endfor %}
                 </div>
             </div>
@@ -99,7 +98,9 @@
     <script src="{{ app.request.basepath }}/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="{{ app.request.basepath }}/bower_components/lodash/lodash.min.js"></script>
     <script src="{{ app.request.basepath }}/bower_components/moment/min/moment-with-locales.min.js"></script>
-    <script src="{{ app.request.basepath }}/bower_components/highstock-release/highstock.js"></script>
-    <!-- <script src="{{ app.request.basepath }}/js/scripts.js"></script> -->
+    <script src="{{ app.request.basepath }}/bower_components/Chart.js/Chart.min.js"></script>
+    <script src="{{ app.request.basepath }}/bower_components/highcharts/highstock.js"></script>
+    <script src="{{ app.request.basepath }}/assets/js/dark-unica-sentinel.js"></script>
+    <script src="{{ app.request.basepath }}/assets/js/dashboard.js"></script>
 </body>
 </html>
