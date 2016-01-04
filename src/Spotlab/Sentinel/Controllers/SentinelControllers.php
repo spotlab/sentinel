@@ -52,6 +52,7 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         $config = new ConfigServiceProvider();
         $app['sentinel.config'] = $config->getConfig();
         $app['sentinel.projects'] = $config->getProjects();
+        $app['sentinel.flatprojects'] = $config->getProjects(true);
         $app['sentinel.series'] = $config->getSeries();
 
         // Create Database
@@ -81,6 +82,7 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
             ));
 
         })
+        ->assert('project', '!^api')
         ->value('project', FALSE)
         ->value('serie', FALSE);
 
@@ -89,11 +91,11 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
 
             // Get data from Database with GET Parameter
             if($request->get('serie')) {
-                $response = new JsonResponse($this->db->findSerie(
+                $response = new JsonResponse($this->db->getSerie(
                     $request->get('project'), $request->get('serie')
                 ));
             } else {
-                $response = new JsonResponse($this->db->findProjectSeries(
+                $response = new JsonResponse($this->db->getProjectSeries(
                     $request->get('project')
                 ));
             }
@@ -106,11 +108,16 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         $controllers->match('/api/average/{project}', function (Request $request) use ($app) {
 
             // Get data from Database with GET Parameter
-            $response = new JsonResponse($this->db->findProjectAverage(
+            return new JsonResponse($this->db->getProjectAverage(
                 $request->get('project')
             ));
+        });
 
-            return $response;
+        // Status Data
+        $controllers->match('/api/status', function (Request $request) use ($app) {
+
+            // Get data from Database with GET Parameter
+            return new JsonResponse($this->db->getStatus($app['sentinel.flatprojects']));
         });
 
         return $controllers;

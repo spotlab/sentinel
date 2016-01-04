@@ -48,18 +48,36 @@ body {
     }
 
     .status-badge {
+        margin-bottom: 50px;
+        text-align: center;
+
         .pie {
             position: relative;
 
-            .caption {
+            .average {
                 position: absolute;
                 top: 50%;
                 left: 50%;
-                width: 50px;
-                height: 18px;
-                margin: -15px 0 0 -10px;
+                width: 100px;
+                height: 20px;
                 text-align: center;
-                font-size: 18px;
+                font-size: 20px;
+                line-height: 20px;
+                margin: -12px 0 0 -50px;
+            }
+        }
+
+        h5{
+            .project {
+                color: @fontTitleColor;
+                display: block;
+                text-transform: uppercase;
+                font-size: 10px;
+            }
+
+            .subproject {
+                display: block;
+                font-size: 14px;
             }
         }
     }

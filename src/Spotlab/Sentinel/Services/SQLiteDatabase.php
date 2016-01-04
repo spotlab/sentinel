@@ -83,7 +83,44 @@ class SQLiteDatabase extends \SQLite3
      * [init description]
      * @return [type] [description]
      */
-    public function findProjectSeries($project, $group = true)
+    public function getStatus($projects)
+    {
+        // Default
+        $return = array(
+            'status' => array(
+                'average' => true,
+                'quality_of_service' => true,
+            )
+        );
+
+        foreach (array_keys($projects) as $project) {
+            $data = $this->getProjectAverage($project);
+
+            // Average TEST
+            if(!empty($data['average']['two_minutes']) && $data['average']['two_minutes']['raw'] < 2) {
+                $return['projects'][$project]['average'] = true;
+            } else {
+                $return['projects'][$project]['average'] = false;
+                $return['status']['average'] = false;
+            }
+
+            // Quality of Service TEST
+            if(!empty($data['quality_of_service']['two_minutes']) && $data['quality_of_service']['two_minutes'] == 100) {
+                $return['projects'][$project]['quality_of_service'] = true;
+            } else {
+                $return['projects'][$project]['quality_of_service'] = false;
+                $return['status']['quality_of_service'] = false;
+            }
+        }
+
+        return $return;
+    }
+
+    /**
+     * [init description]
+     * @return [type] [description]
+     */
+    public function getProjectSeries($project, $group = true)
     {
         $return = array();
 
@@ -115,7 +152,7 @@ class SQLiteDatabase extends \SQLite3
      * [init description]
      * @return [type] [description]
      */
-    public function findSerie($project, $serie)
+    public function getSerie($project, $serie)
     {
         $return = array();
 
@@ -140,12 +177,12 @@ class SQLiteDatabase extends \SQLite3
      * [init description]
      * @return [type] [description]
      */
-    public function findProjectAverage($project)
+    public function getProjectAverage($project)
     {
         $return = array();
 
         // Get Data
-        $data = $this->findProjectSeries($project, $group = false);
+        $data = $this->getProjectSeries($project, $group = false);
 
         // Set duration
         $durations = array();
@@ -180,7 +217,16 @@ class SQLiteDatabase extends \SQLite3
         // Division to get average
         foreach ($calc as $key => $val) {
             if($val['average'] != 0 && $val['success_count'] != 0) {
-                $return['average'][$key] = $val['average'] / $val['success_count'];
+                $average = $val['average'] / $val['success_count'];
+                $return['average'][$key]['raw'] = $average;
+
+                // Human Readable
+                if($average < 1) {
+                    $average = (round($average * 100) * 10) . 'ms';
+                } else {
+                    $average = (round($average * 10) / 10) . 's';
+                }
+                $return['average'][$key]['human'] = $average;
             }
 
             $total_count = $val['success_count'] + $val['failed_count'];

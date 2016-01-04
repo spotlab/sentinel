@@ -12,7 +12,8 @@
     "highcharts": "^4.2",
     "bootstrap": "^3.0",
     "less": "^2.5",
-    "Chart.js": "~1.0.2"
+    "Chart.js": "~1.0.2",
+    "jquery.countdown": "~2.1.0"
   },
   "description": "",
   "main": "",

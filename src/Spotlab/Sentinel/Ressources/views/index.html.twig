@@ -83,6 +83,11 @@
                 {% endfor %}
                 {% endfor %}
                 </div>
+
+                <div class="status-sound"
+                     data-json="{{ app.request.basepath }}/api/status"
+                     data-template="{{ app.request.basepath }}/templates/sound.html">
+                </div>
             </div>
         </div>
     </div>
@@ -94,6 +99,7 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <script src="{{ app.request.basepath }}/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="{{ app.request.basepath }}/bower_components/jquery.countdown/dist/jquery.countdown.min.js"></script>
     <script src="{{ app.request.basepath }}/bower_components/less/dist/less.min.js"></script>
     <script src="{{ app.request.basepath }}/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="{{ app.request.basepath }}/bower_components/lodash/lodash.min.js"></script>
