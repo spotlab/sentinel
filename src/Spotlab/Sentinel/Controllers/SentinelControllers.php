@@ -71,28 +71,13 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         /** @var $controllers \Silex\ControllerCollection */
         $controllers = $app['controllers_factory'];
 
-        // Graphs display
-        $controllers->match('/{project}/{serie}', function (Request $request) use ($app) {
-
-            return $app['twig']->render('index.html.twig', array(
-                'uri' => $_SERVER['REQUEST_URI'],
-                'title' => $app['sentinel.name'],
-                'parameters' => $app['sentinel.config']['parameters'],
-                'projects' => $app['sentinel.config']['projects']
-            ));
-
-        })
-        ->assert('project', '!^api')
-        ->value('project', FALSE)
-        ->value('serie', FALSE);
-
-        // Series Data
-        $controllers->match('/api/content/{project}/{serie}', function (Request $request) use ($app) {
+        // API Series Data
+        $controllers->match('/api/content/{project}/{subproject}', function (Request $request) use ($app) {
 
             // Get data from Database with GET Parameter
-            if($request->get('serie')) {
+            if($request->get('subproject')) {
                 $response = new JsonResponse($this->db->getSerie(
-                    $request->get('project'), $request->get('serie')
+                    $request->get('project'), $request->get('subproject')
                 ));
             } else {
                 $response = new JsonResponse($this->db->getProjectSeries(
@@ -102,23 +87,66 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
 
             return $response;
         })
-        ->value('serie', FALSE);
+        ->method('get')
+        ->value('project', TRUE)
+        ->value('subproject', TRUE);
 
-        // Average Data
+        // API Average Data
         $controllers->match('/api/average/{project}', function (Request $request) use ($app) {
 
             // Get data from Database with GET Parameter
             return new JsonResponse($this->db->getProjectAverage(
                 $request->get('project')
             ));
-        });
+        })
+        ->method('get')
+        ->value('project', TRUE);
 
-        // Status Data
+        // API Status Data
         $controllers->match('/api/status', function (Request $request) use ($app) {
 
             // Get data from Database with GET Parameter
             return new JsonResponse($this->db->getStatus($app['sentinel.flatprojects']));
-        });
+        })
+        ->method('get');
+
+        // HTML Pages
+        $controllers->match('/{project}/{subproject}', function (Request $request) use ($app) {
+
+            if($request->get('project') && $request->get('subproject')) {
+                $p = $request->get('project');
+                $s = $request->get('subproject');
+
+                if(empty($app['sentinel.config']['projects'][$p]['projects'][$s])) {
+                    $app->abort(404, "Post $p/$s does not exist.");
+                }
+
+                $project = $app['sentinel.config']['projects'][$p];
+                $subproject = $app['sentinel.config']['projects'][$p]['projects'][$s];
+
+                return $app['twig']->render('project.html.twig', array(
+                    'uri' => $_SERVER['REQUEST_URI'],
+                    'title' => $app['sentinel.name'],
+                    'header' => $subproject['title'] . ' | ' . $project['title'],
+                    'parameters' => $app['sentinel.config']['parameters'],
+                    'projects' => $app['sentinel.config']['projects'],
+                    'project' => $p,
+                    'subproject' => $s
+                ));
+            } else {
+                return $app['twig']->render('index.html.twig', array(
+                    'uri' => $_SERVER['REQUEST_URI'],
+                    'title' => $app['sentinel.name'],
+                    'header' => 'Tableau de bord',
+                    'parameters' => $app['sentinel.config']['parameters'],
+                    'projects' => $app['sentinel.config']['projects']
+                ));
+            }
+
+        })
+        ->method('get')
+        ->value('project', FALSE)
+        ->value('subproject', FALSE);
 
         return $controllers;
     }

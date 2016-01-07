@@ -1,6 +1,126 @@
 $(function () {
 
     // Badge Dashboard
+    $('.content-graph').each(function(){
+        var graph = {
+            'container' : $(this),
+            'json' : $(this).attr('data-json'),
+            'lastPing' : {},
+            'seriesOptions' : []
+        }
+
+        $.getJSON(graph.json, function(data_load) {
+            _.each(data_load.config, function(serie, website){
+                graph.seriesOptions.push({
+                    name: website,
+                    dataGrouping: {
+                        approximation: "high"
+                    },
+                    data: (function() {
+                        var data = [];
+                        _.each(serie, function(val, key){
+                            data.push({
+                                x: moment(val.date, 'X').toDate().getTime(),
+                                y: val.total_time,
+                            });
+                            graph.lastPing[website] = val.date;
+                        });
+                        return data;
+                    })(),
+                    turboThreshold: 0
+                });
+            });
+
+            createChart(graph);
+        });
+
+        // create the chart when all data is loaded
+        createChart = function (graph) {
+            Highcharts.setOptions({
+                global: {
+                    useUTC: false
+                }
+            });
+
+            graph.container.highcharts('StockChart', {
+                chart : {
+                    type: 'spline',
+                    events: {
+                        load: function () {
+                            var data = {};
+                            var series = this.series;
+
+                            setInterval(function () {
+                                $.getJSON(graph.json, function(data_load) {
+                                    _.each(data_load.config, function(serie, website){
+                                        _.each(serie, function(val, key){
+                                            if(val.date > graph.lastPing[website]) {
+                                                var x = moment(val.date, 'X').toDate().getTime();
+                                                var y = val.total_time;
+                                                _.find(series, {'name': website}).addPoint([x, y],true,true);
+                                                graph.lastPing[website] = val.date;
+                                            }
+                                        });
+                                    });
+                                });
+                            }, 30000);
+                        }
+                    }
+                },
+
+                yAxis: {
+                    labels: {
+                        formatter: function () {
+                            return this.value + 's';
+                        }
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 2,
+                        color: 'silver'
+                    }]
+                },
+
+                tooltip: {
+                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y} sec</b><br/>',
+                    valueDecimals: 2
+                },
+
+                rangeSelector: {
+                    buttons: [{
+                        count: 1,
+                        type: 'hour',
+                        text: '1H'
+                    }, {
+                        count: 3,
+                        type: 'hour',
+                        text: '3H'
+                    }, {
+                        count: 24,
+                        type: 'hour',
+                        text: '24H'
+                    }, {
+                        type: 'all',
+                        text: 'All'
+                    }],
+                    inputEnabled: false,
+                    selected: 0
+                },
+
+                legend: {
+                    enabled: true
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                series: graph.seriesOptions
+            });
+        };
+    });
+
+    // Badge Dashboard
     $('.status-badge').each(function(){
         var badge = {
             'container' : $(this),

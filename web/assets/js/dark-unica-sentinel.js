@@ -17,8 +17,8 @@ Highcharts.theme = {
 		backgroundColor: {
 			linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
 			stops: [
-				[0, '#2a2a2b'],
-				[1, '#2a2a2b']
+				[0, '#252830'],
+				[1, '#252830']
 			]
 		},
 		style: {
