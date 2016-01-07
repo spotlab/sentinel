@@ -72,12 +72,12 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         $controllers = $app['controllers_factory'];
 
         // API Series Data
-        $controllers->match('/api/content/{project}/{subproject}', function (Request $request) use ($app) {
+        $controllers->match('/api/content/{project}/{serie}', function (Request $request) use ($app) {
 
             // Get data from Database with GET Parameter
-            if($request->get('subproject')) {
+            if($request->get('serie')) {
                 $response = new JsonResponse($this->db->getSerie(
-                    $request->get('project'), $request->get('subproject')
+                    $request->get('project'), $request->get('serie')
                 ));
             } else {
                 $response = new JsonResponse($this->db->getProjectSeries(
@@ -89,7 +89,7 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         })
         ->method('get')
         ->value('project', TRUE)
-        ->value('subproject', TRUE);
+        ->value('serie', FALSE);
 
         // API Average Data
         $controllers->match('/api/average/{project}', function (Request $request) use ($app) {

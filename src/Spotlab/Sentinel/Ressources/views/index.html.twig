@@ -8,7 +8,8 @@
              data-template="{{ app.request.basepath }}/templates/badge.html"
              data-json="{{ app.request.basepath }}/api/average/{{ key }}_{{ subkey }}"
              data-project="{{ project.title }}"
-             data-subproject="{{ subproject.title }}">
+             data-subproject="{{ subproject.title }}"
+             data-range="two_minutes">
         </div>
     {% endfor %}
     {% endfor %}

@@ -1,14 +1,55 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-    <div class="status-badge"
-         data-template="{{ app.request.basepath }}/templates/average.html"
-         data-json="{{ app.request.basepath }}/api/average/{{ project }}_{{ subproject }}">
+    <div class="row">
+        <div class="col-md-2 status-badge"
+             data-template="{{ app.request.basepath }}/templates/badge.html"
+             data-json="{{ app.request.basepath }}/api/average/{{ project }}_{{ subproject }}"
+             data-project="2min"
+             data-range="two_minutes">
+        </div>
+        <div class="col-md-2 status-badge"
+             data-template="{{ app.request.basepath }}/templates/badge.html"
+             data-json="{{ app.request.basepath }}/api/average/{{ project }}_{{ subproject }}"
+             data-project="30min"
+             data-range="half_hour">
+        </div>
+        <div class="col-md-2 status-badge"
+             data-template="{{ app.request.basepath }}/templates/badge.html"
+             data-json="{{ app.request.basepath }}/api/average/{{ project }}_{{ subproject }}"
+             data-project="1h"
+             data-range="one_hour">
+        </div>
+        <div class="col-md-2 status-badge"
+             data-template="{{ app.request.basepath }}/templates/badge.html"
+             data-json="{{ app.request.basepath }}/api/average/{{ project }}_{{ subproject }}"
+             data-project="12h"
+             data-range="half_day">
+        </div>
+        <div class="col-md-2 status-badge"
+             data-template="{{ app.request.basepath }}/templates/badge.html"
+             data-json="{{ app.request.basepath }}/api/average/{{ project }}_{{ subproject }}"
+             data-project="1j"
+             data-range="one_day">
+        </div>
+        <div class="col-md-2 status-badge"
+             data-template="{{ app.request.basepath }}/templates/badge.html"
+             data-json="{{ app.request.basepath }}/api/average/{{ project }}_{{ subproject }}"
+             data-project="7j"
+             data-range="one_week">
+        </div>
     </div>
 
     <div class="row">
-        <div class="col-md-12 content-graph"
-             data-template="{{ app.request.basepath }}/templates/badge.html"
+        <div class="col-md-12 content-chart"
+             data-error="false"
+             data-json="{{ app.request.basepath }}/api/content/{{ project }}_{{ subproject }}">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 content-chart"
+             data-error="true"
              data-json="{{ app.request.basepath }}/api/content/{{ project }}_{{ subproject }}">
         </div>
     </div>

@@ -1,29 +1,34 @@
 $(function () {
 
     // Badge Dashboard
-    $('.content-graph').each(function(){
+    $('.content-chart').each(function(){
         var graph = {
             'container' : $(this),
             'json' : $(this).attr('data-json'),
+            'error' : $(this).attr('data-error'),
             'lastPing' : {},
             'seriesOptions' : []
         }
 
-        $.getJSON(graph.json, function(data_load) {
-            _.each(data_load.config, function(serie, website){
+        $.getJSON(graph.json, function(json) {
+            _.each(json, function(requests, serie){
                 graph.seriesOptions.push({
-                    name: website,
+                    name: serie,
                     dataGrouping: {
                         approximation: "high"
                     },
                     data: (function() {
                         var data = [];
-                        _.each(serie, function(val, key){
+                        _.each(requests, function(request, key){
+                            if((graph.error == 'false' && request.error) || (graph.error == 'true' && !request.error)) {
+                                request.ping_time = null;
+                            }
+
                             data.push({
-                                x: moment(val.date, 'X').toDate().getTime(),
-                                y: val.total_time,
+                                x: moment(request.ping_date, 'X').toDate().getTime(),
+                                y: request.ping_time,
                             });
-                            graph.lastPing[website] = val.date;
+                            graph.lastPing[serie] = request.ping_date;
                         });
                         return data;
                     })(),
@@ -31,34 +36,45 @@ $(function () {
                 });
             });
 
-            createChart(graph);
+            createStockChart(graph);
         });
 
         // create the chart when all data is loaded
-        createChart = function (graph) {
+        createStockChart = function (graph) {
             Highcharts.setOptions({
                 global: {
                     useUTC: false
                 }
             });
 
+            // Set chartType
+            if(graph.error == 'false') {
+                var chartType = 'spline';
+            } else {
+                var chartType = 'column';
+            }
+
             graph.container.highcharts('StockChart', {
                 chart : {
-                    type: 'spline',
+                    type: chartType,
                     events: {
                         load: function () {
                             var data = {};
                             var series = this.series;
 
                             setInterval(function () {
-                                $.getJSON(graph.json, function(data_load) {
-                                    _.each(data_load.config, function(serie, website){
-                                        _.each(serie, function(val, key){
-                                            if(val.date > graph.lastPing[website]) {
-                                                var x = moment(val.date, 'X').toDate().getTime();
-                                                var y = val.total_time;
-                                                _.find(series, {'name': website}).addPoint([x, y],true,true);
-                                                graph.lastPing[website] = val.date;
+                                $.getJSON(graph.json, function(json) {
+                                    _.each(json, function(requests, serie){
+                                        _.each(requests, function(request, key){
+                                            if(request.ping_date > graph.lastPing[serie]) {
+                                                if((graph.error == 'false' && request.error) || (graph.error == 'true' && !request.error)) {
+                                                    request.ping_time = null;
+                                                }
+
+                                                var x = moment(request.ping_date, 'X').toDate().getTime();
+                                                var y = request.ping_time;
+                                                _.find(series, {'name': serie}).addPoint([x, y],true,true);
+                                                graph.lastPing[serie] = request.ping_date;
                                             }
                                         });
                                     });
@@ -128,6 +144,7 @@ $(function () {
             'template' : $(this).attr('data-template'),
             'project' : $(this).attr('data-project'),
             'subproject' : $(this).attr('data-subproject'),
+            'range' : $(this).attr('data-range'),
             'display' : [
                 {
                     value: 100,
@@ -172,9 +189,9 @@ $(function () {
 
         getAverageData = function(badge, template) {
             $.getJSON(badge.json, function(data) {
-                if(data.quality_of_service.two_minutes && data.average.two_minutes) {
-                    var percent = data.quality_of_service.two_minutes;
-                    var average = data.average.two_minutes;
+                if(data.quality_of_service[badge.range] && data.average[badge.range]) {
+                    var percent = data.quality_of_service[badge.range];
+                    var average = data.average[badge.range];
                 }
 
                 // Analysing average and percent
@@ -202,7 +219,6 @@ $(function () {
                     .find('.average').html(average.human).end()
                     .find('canvas').each(function(){
                         var canvas = $(this);
-                        var name = canvas.attr('class');
                         new Chart(canvas.get(0).getContext("2d")).Doughnut(badge.display, badge.options);
                     });
             });
