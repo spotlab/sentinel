@@ -1,6 +1,6 @@
 <ifmodule mod_headers.c>
-    <filesmatch "\\.(json)$">
-        Header set Cache-Control "no-cache, max-age=0, private"
+    <filesmatch "\\.(html)$">
+        Header set Cache-Control "no-cache, max-age=300, private"
     </filesmatch>
 </ifmodule>
 
