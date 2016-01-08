@@ -30,8 +30,10 @@
 
             <div class="col-md-2 sidebar">
                 <header class="brand">
-                    <h1>{{ title }}</h1>
-                    <p class="company">by {{ parameters.company }}</p>
+                    <a href="{{ app.request.basepath }}/">
+                        <h1>{{ title }}</h1>
+                        <p class="company">by {{ parameters.company }}</p>
+                    </a>
                 </header>
 
                 <nav class="nav">
