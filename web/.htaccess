@@ -1,6 +1,6 @@
 <ifmodule mod_headers.c>
     <filesmatch "\\.(html)$">
-        Header set Cache-Control "no-cache, max-age=300, private"
+        Header set Cache-Control "max-age=300, private"
     </filesmatch>
 </ifmodule>
 
