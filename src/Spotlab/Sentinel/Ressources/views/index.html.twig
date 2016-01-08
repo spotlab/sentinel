@@ -1,7 +1,7 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-    <div class="row">
+    <div class="row dashboard">
     {% for key, project in projects %}
     {% for subkey, subproject in project.projects %}
         <div class="col-md-3 status-badge"
