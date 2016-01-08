@@ -10,5 +10,6 @@ phpunit
 /composer.phar
 
 # Config files
+/database/
 *.yml
 *.json

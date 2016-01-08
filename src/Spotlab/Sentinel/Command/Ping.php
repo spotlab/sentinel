@@ -2,11 +2,14 @@
 
 namespace Spotlab\Sentinel\Command;
 
-use Spotlab\Sentinel\Tools\Guardian;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Spotlab\Sentinel\Services\ConfigServiceProvider;
+use Spotlab\Sentinel\Services\SQLiteDatabase;
 
 /**
  * Class Backup
@@ -21,12 +24,6 @@ class Ping extends Command
     {
         $this->setName('ping')
              ->setDescription('Ping all websites');
-
-        $this->addArgument(
-            'config',
-            InputArgument::REQUIRED,
-            'The path to the config file (.yml)'
-        );
     }
 
     /**
@@ -38,77 +35,91 @@ class Ping extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        // First step : Analysing config
-        $config_path = $input->getArgument('config');
-        $guardian = new Guardian($config_path);
-        $output->writeln(sprintf('Analysing config file : <info>%s</info>', $config_path));
-        $output->write("\n");
+        // Create Guzzle CLient
+        $client = new Client();
 
-        // Actions for every projects in config
-        $requests = $guardian->getRequests();
-        $data = $guardian->getData();
+        // Create Database
+        $this->db = new SQLiteDatabase();
+
+        // Get Projects
+        $config = new ConfigServiceProvider();
+        $projects = $config->getProjects($flat = true);
+        $output->writeln(sprintf('FIND : <comment>%s projects</comment>', count($projects)));
 
         // Register time
         $now = time();
 
-        foreach ($requests as $line => $config) {
+        foreach ($projects as $project_name => $project) {
+            foreach ($project['series'] as $serie_name => $serie) {
+                // Get Options
+                $options = array();
+                $options['future'] = true;
+                $options['allow_redirects'] = true;
+                $options['timeout'] = 30;
 
-            $output->writeln(sprintf('> Start : <info>%s</info>', $line));
-            $output->writeln('------------------------------');
+                // Get Request params
+                if(!empty($serie['headers'])) $options['headers'] = $serie['headers'];
+                if(!empty($serie['body'])) $options['body'] = $serie['body'];
 
-            // Création d'un gestionnaire curl
-            $ch = curl_init();
+                // Init Ping Object
+                $ping = array();
+                $ping['project'] = $project_name;
+                $ping['serie'] = $serie_name;
+                $ping['ping_date'] = $now;
 
-            // Configuration de l'URL et d'autres options
-            curl_setopt($ch, CURLOPT_URL, $config['url']);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HEADER, false);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-            if(!empty($config['method']) && $config['method'] == 'POST') curl_setopt($ch, CURLOPT_POST, true);
-            if(!empty($config['header'])) curl_setopt($ch, CURLOPT_HTTPHEADER, $config['header']);
-            if(!empty($config['content'])) curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($config['content']));
+                // Start Guzzle Requests
+                $time_start = microtime(true);
+                $req = $client->createRequest($serie['method'], $serie['url'], $options);
+                $client->send($req)->then(
+                    function ($response) use ($output, $ping, $time_start) {
+                        $time_end = microtime(true);
+                        $time = $time_end - $time_start;
 
-            // // Exécution
-            curl_exec($ch);
+                        // Update Ping Data
+                        $ping['ping_time'] = $time;
+                        $ping['http_status'] = $response->getStatusCode();
+                        $ping['error'] = false;
 
-            // Vérification si une erreur est survenue
-            $error = '';
-            if(!curl_errno($ch)) {
-                $total_time = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
-                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                $output->write($total_time . 's (' . $http_code . ')');
+                        // Insert Ping on Database
+                        if($this->db->insert($ping)){
+                            $output->writeln(
+                                sprintf('SUCCESS %s > %s <info>%s</info>',
+                                $ping['project'],
+                                $ping['serie'],
+                                $time)
+                            );
+                        } else {
+                            throw new \Exception('Database insert failed', 0);
+                        }
+                    },
+                    function ($error) use ($output, $ping, $time_start)  {
+                        $time_end = microtime(true);
+                        $time = $time_end - $time_start;
 
-                // Failed if 404, 500, ...
-                if ($http_code >= 400) {
-                    $total_time = null;
-                    $error = $http_code;
-                }
-            } else {
-                $error = curl_error($ch);
-                $total_time = null;
-                $http_code = 999;
-                $output->write($error);
+                        // Update Ping Data
+                        $ping['ping_time'] = $time;
+                        $ping['error'] = true;
+                        $ping['error_log'] = $error->getMessage();
+
+                        if($error->getCode() !== 0) {
+                            $ping['http_status'] = $error->getCode();
+                        }
+
+                        // Insert Ping on Database
+                        if($this->db->insert($ping)){
+                            $output->writeln(
+                                sprintf('FAILED %s > %s <error>%s</error>',
+                                $ping['project'],
+                                $ping['serie'],
+                                $error->getMessage())
+                            );
+                        } else {
+                            throw new \Exception('Database insert failed', 0);
+                        }
+                        throw $error;
+                    }
+                );
             }
-
-            // Add Data
-            $data[$line][] = array(
-                'date' => $now,
-                'total_time' => $total_time,
-                'http_code' => $http_code,
-                'error' => $error
-            );
-
-            // Fermeture du gestionnaire
-            curl_close($ch);
-
-            $output->write("\n\n");
         }
-
-        // Save date into file
-        $output->writeln('> Save data');
-        $output->writeln('------------------------------');
-        $guardian->setData($data);
-        $output->writeln('Finished : <info>Done</info>');
     }
 }

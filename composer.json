@@ -4,7 +4,7 @@
     "description": "",
     "keywords": ["sentinel","graph","monitor"],
     "homepage": "https://github.com/spotlab/sentinel.git",
-    "license": "proprietary",
+    "license": "MIT",
     "authors": [
         {
             "name": "Léo POIROUX",
@@ -20,8 +20,8 @@
         "symfony/console": "^2.7",
         "symfony/process": "^2.7",
         "symfony/yaml": "^2.7",
-        "symfony/finder": "^2.7",
-        "symfony/twig-bridge": "^2.7"
+        "symfony/twig-bridge": "^2.7",
+        "guzzlehttp/guzzle": "^5.0"
     },
     "autoload": {
         "psr-0": {

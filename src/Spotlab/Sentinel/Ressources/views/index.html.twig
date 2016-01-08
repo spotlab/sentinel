@@ -1,0 +1,22 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <div class="row">
+    {% for key, project in projects %}
+    {% for subkey, subproject in project.projects %}
+        <div class="col-md-3 status-badge"
+             data-template="{{ app.request.basepath }}/templates/badge.html"
+             data-json="{{ app.request.basepath }}/api/average/{{ key }}_{{ subkey }}"
+             data-project="{{ project.title }}"
+             data-subproject="{{ subproject.title }}"
+             data-range="two_minutes">
+        </div>
+    {% endfor %}
+    {% endfor %}
+    </div>
+
+    <div class="status-sound"
+         data-json="{{ app.request.basepath }}/api/status"
+         data-template="{{ app.request.basepath }}/templates/sound.html">
+    </div>
+{% endblock %}
