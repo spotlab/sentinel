@@ -20,14 +20,22 @@ $(function () {
                     data: (function() {
                         var data = [];
                         _.each(requests, function(request, key){
-                            if((graph.error == 'false' && request.error) || (graph.error == 'true' && !request.error)) {
-                                request.ping_time = null;
+                            if(graph.error == 'true') {
+                                if(!request.error) request.http_status = null;
+
+                                data.push({
+                                    x: moment(request.ping_date, 'X').toDate().getTime(),
+                                    y: request.http_status,
+                                });
+                            } else {
+                                if(request.error) request.ping_time = null;
+
+                                data.push({
+                                    x: moment(request.ping_date, 'X').toDate().getTime(),
+                                    y: request.ping_time,
+                                });
                             }
 
-                            data.push({
-                                x: moment(request.ping_date, 'X').toDate().getTime(),
-                                y: request.ping_time,
-                            });
                             graph.lastPing[serie] = request.ping_date;
                         });
                         return data;
@@ -50,8 +58,12 @@ $(function () {
             // Set chartType
             if(graph.error == 'false') {
                 var chartType = 'spline';
+                var chartLabel = 's';
+                var chartDecimal = 2;
             } else {
                 var chartType = 'column';
+                var chartLabel = '';
+                var chartDecimal = 0;
             }
 
             graph.container.highcharts('StockChart', {
@@ -66,16 +78,20 @@ $(function () {
                                 $.getJSON(graph.json, function(json) {
                                     _.each(json, function(requests, serie){
                                         _.each(requests, function(request, key){
-                                            if(request.ping_date > graph.lastPing[serie]) {
-                                                if((graph.error == 'false' && request.error) || (graph.error == 'true' && !request.error)) {
-                                                    request.ping_time = null;
-                                                }
+                                            if(graph.error == 'true') {
+                                                if(!request.error) request.http_status = null;
+
+                                                var x = moment(request.ping_date, 'X').toDate().getTime();
+                                                var y = request.http_status;
+                                            } else {
+                                                if(request.error) request.ping_time = null;
 
                                                 var x = moment(request.ping_date, 'X').toDate().getTime();
                                                 var y = request.ping_time;
-                                                _.find(series, {'name': serie}).addPoint([x, y],true,true);
-                                                graph.lastPing[serie] = request.ping_date;
                                             }
+
+                                            _.find(series, {'name': serie}).addPoint([x, y],true,true);
+                                            graph.lastPing[serie] = request.ping_date;
                                         });
                                     });
                                 });
@@ -87,7 +103,7 @@ $(function () {
                 yAxis: {
                     labels: {
                         formatter: function () {
-                            return this.value + 's';
+                            return this.value + chartLabel;
                         }
                     },
                     plotLines: [{
@@ -98,8 +114,8 @@ $(function () {
                 },
 
                 tooltip: {
-                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y} sec</b><br/>',
-                    valueDecimals: 2
+                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}' + chartLabel + '</b><br/>',
+                    valueDecimals: chartDecimal
                 },
 
                 rangeSelector: {
