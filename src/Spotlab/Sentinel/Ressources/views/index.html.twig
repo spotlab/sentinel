@@ -5,7 +5,8 @@
     {% for key, project in projects %}
     {% for subkey, subproject in project.projects %}
         <div class="col-md-3 status-badge"
-             data-template="{{ app.request.basepath }}/templates/badge.html"
+             data-group="false"
+             data-template="{{ app.request.basepath }}/api/templates/badge"
              data-json="{{ app.request.basepath }}/api/average/{{ key }}_{{ subkey }}"
              data-project="{{ project.title }}"
              data-subproject="{{ subproject.title }}"
@@ -17,6 +18,6 @@
 
     <div class="status-sound"
          data-json="{{ app.request.basepath }}/api/status"
-         data-template="{{ app.request.basepath }}/templates/sound.html">
+         data-template="{{ app.request.basepath }}/api/templates/sound">
     </div>
 {% endblock %}

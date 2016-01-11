@@ -7,6 +7,7 @@ use Silex\ControllerCollection;
 use Silex\ControllerProviderInterface;
 use Silex\ServiceProviderInterface;
 use Silex\Provider\TwigServiceProvider;
+use Silex\Provider\HttpCacheServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -76,13 +77,15 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
 
             // Get data from Database with GET Parameter
             if($request->get('serie')) {
-                $response = new JsonResponse($this->db->getSerie(
-                    $request->get('project'), $request->get('serie')
-                ));
+                $response = new JsonResponse(
+                    $this->db->getSerie($request->get('project'), $request->get('serie')),
+                    200, array('Cache-Control' => 'max-age=20, private, must-revalidate')
+                );
             } else {
-                $response = new JsonResponse($this->db->getProjectSeries(
-                    $request->get('project')
-                ));
+                $response = new JsonResponse(
+                    $this->db->getProjectSeries($request->get('project')),
+                    200, array('Cache-Control' => 'max-age=20, private, must-revalidate')
+                );
             }
 
             return $response;
@@ -92,12 +95,22 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         ->value('serie', FALSE);
 
         // API Average Data
+        $controllers->match('/api/templates/{template}', function (Request $request) use ($app) {
+
+            // Get data from Database with GET Parameter
+            return $app['twig']->render('partial/' . $request->get('template') . '.html.twig');
+        })
+        ->method('get')
+        ->value('template', 'badge|average|sound');
+
+        // API Average Data
         $controllers->match('/api/average/{project}', function (Request $request) use ($app) {
 
             // Get data from Database with GET Parameter
-            return new JsonResponse($this->db->getProjectAverage(
-                $request->get('project')
-            ));
+            return new JsonResponse(
+                $this->db->getProjectAverage($request->get('project')),
+                200, array('Cache-Control' => 'max-age=20, private, must-revalidate')
+            );
         })
         ->method('get')
         ->value('project', TRUE);
@@ -106,7 +119,10 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         $controllers->match('/api/status', function (Request $request) use ($app) {
 
             // Get data from Database with GET Parameter
-            return new JsonResponse($this->db->getStatus($app['sentinel.flatprojects']));
+            return new JsonResponse(
+                $this->db->getStatus($app['sentinel.flatprojects']),
+                200, array('Cache-Control' => 'max-age=20, private, must-revalidate')
+            );
         })
         ->method('get');
 
