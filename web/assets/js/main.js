@@ -207,7 +207,7 @@ $(function () {
                 }
             ],
             'options' : {
-                showTooltips: false,
+                showTooltips: true,
                 segmentShowStroke : true,
                 segmentStrokeColor : "#252830",
                 segmentStrokeWidth : 2,
