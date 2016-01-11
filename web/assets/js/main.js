@@ -260,14 +260,10 @@ $(function () {
                 badge.display[0].value = 0;
                 badge.display[1].value = 100;
                 badge.display[2].value = 0;
-            } else if (average.raw >= 2) {
-                badge.display[0].value = 0;
-                badge.display[1].value = 0;
-                badge.display[2].value = 100;
             } else {
-                badge.display[0].value = percent;
-                badge.display[1].value = 100 - percent;
-                badge.display[2].value = 0;
+                badge.display[0].value = percent.success;
+                badge.display[1].value = percent.failed;
+                badge.display[2].value = percent.toolong;
             }
 
             // Append Template

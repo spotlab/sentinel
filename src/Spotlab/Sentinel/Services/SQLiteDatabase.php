@@ -201,12 +201,15 @@ class SQLiteDatabase extends \SQLite3
                     $calc[$key]['average'] = 0;
                     $calc[$key]['success_count'] = 0;
                     $calc[$key]['failed_count'] = 0;
+                    $calc[$key]['toolong_count'] = 0;
                 }
 
                 if($val['ping_date'] >= $time) {
                     $calc[$key]['average'] += $val['ping_time'];
                     if($val['error']) {
                         $calc[$key]['failed_count']++;
+                    } else if($val['ping_time'] >= 2) {
+                        $calc[$key]['toolong_count']++;
                     } else {
                         $calc[$key]['success_count']++;
                     }
@@ -229,9 +232,13 @@ class SQLiteDatabase extends \SQLite3
                 $return['average'][$key]['human'] = $average;
             }
 
-            $total_count = $val['success_count'] + $val['failed_count'];
+            $total_count = $val['success_count'] + $val['failed_count'] + $val['toolong_count'];
             if($total_count != 0) {
-                $return['quality_of_service'][$key] = round(($val['success_count'] / $total_count) * 100);
+                $return['quality_of_service'][$key] = array(
+                    'success' => round(($val['success_count'] / $total_count) * 100),
+                    'failed' => round(($val['failed_count'] / $total_count) * 100),
+                    'toolong' => round(($val['toolong_count'] / $total_count) * 100),
+                );
             }
         }
 
