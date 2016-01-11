@@ -79,11 +79,13 @@ $(function () {
                 var chartType = 'spline';
                 var chartLabel = 's';
                 var chartDecimal = 2;
+                var chartSelected = 0;
             } else {
                 var chartContainer = $('<div class="col-md-12 failed"></div>');
                 var chartType = 'column';
                 var chartLabel = '';
                 var chartDecimal = 0;
+                var chartSelected = 3;
             }
 
             // Append Chart
@@ -160,7 +162,7 @@ $(function () {
                             text: 'All'
                         }],
                         inputEnabled: false,
-                        selected: 0
+                        selected: chartSelected
                     },
 
                     legend: {
