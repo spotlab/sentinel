@@ -156,14 +156,18 @@ class SQLiteDatabase extends \SQLite3
     {
         $return = array();
 
+        // Set max date (1 week max)
+        $max_date = time() - 604800;
+
         // Send query
         $statement = $this->prepare('
             SELECT * FROM sentinel
-            WHERE project = :project AND serie = :serie
+            WHERE project = :project AND serie = :serie AND ping_date >= :max_date
             ORDER BY ping_date
         ');
         $statement->bindValue(':project', $project);
         $statement->bindValue(':serie', $serie);
+        $statement->bindValue(':max_date', $max_date);
         $results = $statement->execute();
 
         while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
