@@ -105,7 +105,7 @@ class SQLiteDatabase extends \SQLite3
             }
 
             // Quality of Service TEST
-            if(!empty($data['quality_of_service']['two_minutes']) && $data['quality_of_service']['two_minutes'] == 100) {
+            if(isset($data['quality_of_service']['two_minutes']['failed']) && $data['quality_of_service']['two_minutes']['failed'] == 0) {
                 $return['projects'][$project]['quality_of_service'] = true;
             } else {
                 $return['projects'][$project]['quality_of_service'] = false;
