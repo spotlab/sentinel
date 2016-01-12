@@ -103,6 +103,8 @@ class Ping extends Command
 
                         if($error->getCode() !== 0) {
                             $ping['http_status'] = $error->getCode();
+                        } else {
+                            $ping['http_status'] = 504;
                         }
 
                         // Insert Ping on Database
