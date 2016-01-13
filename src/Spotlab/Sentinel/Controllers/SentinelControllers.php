@@ -52,11 +52,12 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         $config = new ConfigServiceProvider();
         $app['sentinel.config'] = $config->getConfig();
         $app['sentinel.projects'] = $config->getProjects();
+        $app['sentinel.parameters'] = $config->getParameters();
         $app['sentinel.flatprojects'] = $config->getProjects(true);
         $app['sentinel.series'] = $config->getSeries();
 
         // Create Database
-        $this->db = new MongoDatabase($app['sentinel.config']['parameters']['mongo']);
+        $this->db = new MongoDatabase($app['sentinel.parameters']['mongo']);
     }
 
     /**

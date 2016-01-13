@@ -38,13 +38,14 @@ class Ping extends Command
         // Create Guzzle CLient
         $client = new Client();
 
-        // Create Database
-        $this->db = new MongoDatabase();
-
         // Get Projects
         $config = new ConfigServiceProvider();
         $projects = $config->getProjects($flat = true);
+        $parameters = $config->getParameters();
         $output->writeln(sprintf('FIND : <comment>%s projects</comment>', count($projects)));
+
+        // Create Database
+        $this->db = new MongoDatabase($parameters['mongo']);
 
         // Register time
         $now = time();
