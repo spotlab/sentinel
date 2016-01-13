@@ -3,7 +3,7 @@
 namespace Spotlab\Sentinel\Services;
 
 /**
- * SQLiteDatabase
+ * MongoDatabase
  */
 class MongoDatabase
 {
