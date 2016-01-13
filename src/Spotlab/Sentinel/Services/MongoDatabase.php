@@ -5,78 +5,24 @@ namespace Spotlab\Sentinel\Services;
 /**
  * SQLiteDatabase
  */
-class SQLiteDatabase extends \SQLite3
+class MongoDatabase
 {
-    private $table;
+    public $mongo;
+    public $mongo_db;
+    public $mongo_collection;
+    public $timeout;
 
-    function __construct()
+    public function __construct($uri)
     {
-        // Database File
-        $database = __DIR__ . '/../../../../database/SQLiteSentinel.db';
-        $this->open($database);
-
-        // Table structure
-        $table = array();
-        $table['id'] = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-        $table['project'] = 'TEXT NOT NULL';
-        $table['serie'] = 'TEXT NOT NULL';
-        $table['ping_date'] = 'DATETIME NOT NULL';
-        $table['ping_time'] = 'INTEGER';
-        $table['http_status'] = 'INTEGER';
-        $table['error'] = 'BOOLEAN';
-        $table['error_log'] = 'TEXT';
-
-        $this->table = $table;
-
-        // Create Database if not exist
-        $this->create();
+        $this->mongo = new \MongoClient($uri);
+        $this->mongo_db = $this->mongo->selectDB('sentinel');
+        $this->mongo_collection = new \MongoCollection($this->mongo_db, 'ping');
+        //$this->mongo_collection->createIndex(array('key' => 1), array('unique' => 1));
     }
 
-    /**
-     * [init description]
-     * @return [type] [description]
-     */
-    private function create()
+    public function insert($value)
     {
-        if(!$this){
-            throw new \Exception($db->lastErrorMsg(), 0);
-        } else {
-            $fields = array();
-            foreach ($this->table as $name => $type) {
-                $fields[] = $name . ' ' . $type;
-            }
-
-            $query = 'CREATE TABLE IF NOT EXISTS sentinel (' . implode(',', $fields) . ')';
-            $this->exec($query);
-        }
-    }
-
-    /**
-     * [savePing description]
-     * @param  [type] $ping [description]
-     * @return [type]       [description]
-     */
-    public function insert($ping)
-    {
-        $fields = $values = array();
-        foreach ($this->table as $name => $type) {
-            if($name == 'id') continue;
-
-            // Set VALUES
-            if(strpos($type, 'NOT NULL') !== false && empty($ping[$name])) {
-                throw new \Exception('Database Field ' . $name . 'required', 0);
-            } elseif (empty($ping[$name])) {
-                $values[] = 'NULL';
-            } else {
-                $values[] = '"' . $ping[$name] . '"';
-            }
-
-            // Set INSERT
-            $fields[] = $name;
-        }
-
-        $query = 'INSERT INTO sentinel (' . implode(',', $fields) . ') VALUES (' . implode(',', $values) . ')';
-        return $this->exec($query);
+        return $this->mongo_collection->save($value);
     }
 
     /**
@@ -120,7 +66,7 @@ class SQLiteDatabase extends \SQLite3
      * [init description]
      * @return [type] [description]
      */
-    public function getProjectSeries($project, $group = true)
+    public function getSerie($project, $serie)
     {
         $return = array();
 
@@ -128,21 +74,22 @@ class SQLiteDatabase extends \SQLite3
         $max_date = time() - 604800;
 
         // Send query
-        $statement = $this->prepare('
-            SELECT * FROM sentinel
-            WHERE project = :project AND ping_date >= :max_date
-            ORDER BY ping_date
-        ');
-        $statement->bindValue(':project', $project);
-        $statement->bindValue(':max_date', $max_date);
-        $results = $statement->execute();
+        $cursor = $this->mongo_collection
+                            ->find(array(
+                                'project' => $project,
+                                'serie' => $serie,
+                                'ping_date' => array('$gt' => $max_date)
+                            ))
+                            ->sort(array('ping_date' => 1));
 
-        while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
-            if($group) {
-                $return[$row['serie']][] = $row;
-            } else {
-                $return[] = $row;
-            }
+        foreach ($cursor as $doc) {
+            $return[] = array(
+                'ping_date' => $doc['ping_date'],
+                //'ping_human_date' => date('r', $doc['ping_date']),
+                'ping_time' => $doc['ping_time'],
+                'http_status' => $doc['http_status'],
+                'error' => $doc['error'],
+            );
         }
 
         return $return;
@@ -152,7 +99,7 @@ class SQLiteDatabase extends \SQLite3
      * [init description]
      * @return [type] [description]
      */
-    public function getSerie($project, $serie)
+    public function getProjectSeries($project, $group = true)
     {
         $return = array();
 
@@ -160,18 +107,27 @@ class SQLiteDatabase extends \SQLite3
         $max_date = time() - 604800;
 
         // Send query
-        $statement = $this->prepare('
-            SELECT * FROM sentinel
-            WHERE project = :project AND serie = :serie AND ping_date >= :max_date
-            ORDER BY ping_date
-        ');
-        $statement->bindValue(':project', $project);
-        $statement->bindValue(':serie', $serie);
-        $statement->bindValue(':max_date', $max_date);
-        $results = $statement->execute();
+        $cursor = $this->mongo_collection
+                            ->find(array(
+                                'project' => $project,
+                                'ping_date' => array('$gt' => $max_date)
+                            ))
+                            ->sort(array('ping_date' => 1, 'serie' => 1));
 
-        while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
-            $return[] = $row;
+        foreach ($cursor as $doc) {
+            $row = array(
+                'ping_date' => $doc['ping_date'],
+                //'ping_human_date' => date('r', $doc['ping_date']),
+                'ping_time' => $doc['ping_time'],
+                'http_status' => $doc['http_status'],
+                'error' => $doc['error'],
+            );
+
+            if($group) {
+                $return[$doc['serie']][] = $row;
+            } else {
+                $return[] = $row;
+            }
         }
 
         return $return;

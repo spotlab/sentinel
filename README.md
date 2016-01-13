@@ -1,4 +1,4 @@
-# Sentinel - PHP
+# Sentinel - PHP / MongoDB
 
 Simple application that ping and save the response time of several urls. These times are shown on a graph updated in real time.
 
@@ -7,6 +7,7 @@ Simple application that ping and save the response time of several urls. These t
 ## Requirements
 
 - PHP 5 >= 5.3.0
+- MongoDB
 
 ## Getting started
 
@@ -23,7 +24,8 @@ composer install
 ```
 ---
 parameters:
-    company: Raccourci
+    company: Spotlab
+    mongo: mongodb://<username>:<password>@xxxxxxx.mongolab.com:41683/sentinel
 
 projects:
     drupal6:

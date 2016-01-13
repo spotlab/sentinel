@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Spotlab\Sentinel\Services\ConfigServiceProvider;
-use Spotlab\Sentinel\Services\SQLiteDatabase;
+use Spotlab\Sentinel\Services\MongoDatabase;
 
 
 /**
@@ -56,7 +56,7 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         $app['sentinel.series'] = $config->getSeries();
 
         // Create Database
-        $this->db = new SQLiteDatabase();
+        $this->db = new MongoDatabase($app['sentinel.config']['parameters']['mongo']);
     }
 
     /**

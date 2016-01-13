@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Spotlab\Sentinel\Services\ConfigServiceProvider;
-use Spotlab\Sentinel\Services\SQLiteDatabase;
+use Spotlab\Sentinel\Services\MongoDatabase;
 
 /**
  * Class Backup
@@ -39,7 +39,7 @@ class Ping extends Command
         $client = new Client();
 
         // Create Database
-        $this->db = new SQLiteDatabase();
+        $this->db = new MongoDatabase();
 
         // Get Projects
         $config = new ConfigServiceProvider();
