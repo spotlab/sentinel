@@ -7,8 +7,19 @@
          data-json="{{ app.request.basepath }}/api/average/{{ project }}_{{ subproject }}">
     </div>
 
-    <div class="row content-chart"
+    <div class="row ping-charts"
          data-json="{{ app.request.basepath }}/api/content/{{ project }}_{{ subproject }}">
+        <div class="col-md-12 chart success"
+              data-type="spline"
+              data-label="s"
+              data-decimal="2">
+        </div>
+        <!-- <div class="col-md-12 chart failed"
+              data-type="column"
+              data-label=""
+              data-decimal="0">
+        </div>
+         <div class="col-md-12 log"></div> -->
     </div>
 
     <div class="status-sound"

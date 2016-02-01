@@ -3,6 +3,8 @@
 
 use Symfony\Component\Console\Application;
 use Spotlab\Sentinel\Command\Ping;
+use Spotlab\Sentinel\Command\Watch;
+use Spotlab\Sentinel\Command\Average;
 
 if (PHP_SAPI !== 'cli') {
     echo 'Warning: Sentinel should be invoked via the CLI version of PHP, not the '.PHP_SAPI.' SAPI'.PHP_EOL;
@@ -54,6 +56,8 @@ if (is_file(__DIR__ . '/../vendor/autoload.php')) {
  */
 $app = new Application();
 $app->setName('Sentinel');
-$app->setVersion('v1.0');
+$app->setVersion('v3.0');
 $app->add(new Ping());
+$app->add(new Watch());
+$app->add(new Average());
 $app->run();

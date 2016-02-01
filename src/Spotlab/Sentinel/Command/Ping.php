@@ -5,7 +5,6 @@ namespace Spotlab\Sentinel\Command;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Spotlab\Sentinel\Services\ConfigServiceProvider;
@@ -17,6 +16,8 @@ use Spotlab\Sentinel\Services\MongoDatabase;
  */
 class Ping extends Command
 {
+    private $db;
+
     /**
      * Set us up the command!
      */
@@ -48,7 +49,7 @@ class Ping extends Command
         $this->db = new MongoDatabase($parameters['mongo']);
 
         // Register time
-        $now = time();
+        $now = new \MongoDate();
 
         foreach ($projects as $project_name => $project) {
             foreach ($project['series'] as $serie_name => $serie) {
@@ -79,10 +80,9 @@ class Ping extends Command
                         // Update Ping Data
                         $ping['ping_time'] = $time;
                         $ping['http_status'] = $response->getStatusCode();
-                        $ping['error'] = false;
 
                         // Insert Ping on Database
-                        if($this->db->insert($ping)){
+                        if($this->db->insert('ping', $ping)){
                             $output->writeln(
                                 sprintf('SUCCESS %s > %s <info>%s</info>',
                                 $ping['project'],
@@ -93,14 +93,10 @@ class Ping extends Command
                             throw new \Exception('Database insert failed', 0);
                         }
                     },
-                    function ($error) use ($output, $ping, $time_start)  {
-                        $time_end = microtime(true);
-                        $time = $time_end - $time_start;
+                    function ($error) use ($output, $ping)  {
 
                         // Update Ping Data
-                        $ping['ping_time'] = $time;
-                        $ping['error'] = true;
-                        $ping['error_log'] = $error->getMessage();
+                        $ping['error'] = $error->getMessage();
 
                         if($error->getCode() !== 0) {
                             $ping['http_status'] = $error->getCode();
@@ -109,7 +105,7 @@ class Ping extends Command
                         }
 
                         // Insert Ping on Database
-                        if($this->db->insert($ping)){
+                        if($this->db->insert('ping', $ping)){
                             $output->writeln(
                                 sprintf('FAILED %s > %s <error>%s</error>',
                                 $ping['project'],

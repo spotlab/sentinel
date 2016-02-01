@@ -1,7 +1,137 @@
 $(function () {
 
-    // Badge Dashboard
-    $('.content-chart').each(function(){
+    $('.ping-charts').each(function(){
+        var charts = {
+            'container' : $(this),
+            'json' : $(this).attr('data-json'),
+            'series' : [],
+            'data' : [],
+            'last_ping' : {},
+        }
+
+        setInterval(function () {
+            $.getJSON(charts.json, function(json) {
+                // Set Global Data
+                charts.data = json;
+            });
+        }, 30000);
+
+        $.getJSON(charts.json, function(json) {
+            // Set Global Data
+            charts.data = json;
+
+            // Create empty series
+            _.each(json, function(requests, serie){
+                charts.series.push({
+                    name: serie,
+                    dataGrouping: {
+                        approximation: "high"
+                    },
+                    data: [],
+                    turboThreshold: 0
+                });
+
+                charts.last_ping[serie] = 0;
+            });
+
+            charts.container
+                .find('.chart')
+                .each(function(){
+                    var chart = {
+                        'container' : $(this),
+                        'type' : $(this).attr('data-type'),
+                        'label' : $(this).attr('data-label'),
+                        'decimal' : $(this).attr('data-decimal'),
+                    }
+
+                    chart.container.highcharts('StockChart', {
+                        chart : {
+                            type: chart.type,
+                            events: {
+                                load: function () {
+                                    var series = this.series;
+
+                                    setInterval(function () {
+                                        _.each(charts.data, function(requests, serie){
+                                            _.each(requests, function(request, key){
+                                                if(request.ping_date > charts.last_ping[serie]) {
+                                                    if(request.error) request.ping_time = null;
+
+                                                    var x = moment(request.ping_date, 'X').toDate().getTime();
+                                                    var y = request.ping_time;
+
+                                                    _.find(series, {'name': serie}).addPoint([x, y],true,true);
+
+                                                    // Save Last Ping
+                                                    charts.last_ping[serie] = request.ping_date;
+                                                } else {
+                                                    console.log(request.ping_date, charts.last_ping[serie]);
+                                                }
+                                            });
+                                        });
+                                    }, 3000);
+                                }
+                            }
+                        },
+
+                        yAxis: {
+                            labels: {
+                                formatter: function () {
+                                    return this.value + chart.label;
+                                }
+                            },
+                            plotLines: [{
+                                value: 0,
+                                width: 2,
+                                color: 'silver'
+                            }]
+                        },
+
+                        tooltip: {
+                            pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}' + chart.label + '</b><br/>',
+                            valueDecimals: chart.decimal
+                        },
+
+                        rangeSelector: {
+                            buttons: [{
+                                count: 1,
+                                type: 'hour',
+                                text: '1H'
+                            }, {
+                                count: 3,
+                                type: 'hour',
+                                text: '3H'
+                            }, {
+                                count: 24,
+                                type: 'hour',
+                                text: '24H'
+                            }, {
+                                type: 'all',
+                                text: 'All'
+                            }],
+                            inputEnabled: false,
+                            selected: 0
+                        },
+
+                        legend: {
+                            enabled: true
+                        },
+
+                        credits: {
+                            enabled: false
+                        },
+
+                        series: charts.series
+                    });
+                });
+            });
+        });
+
+
+
+
+    // Charts Project
+    $('.content-charts').each(function(){
         var graph = {
             'container' : $(this),
             'json' : $(this).attr('data-json'),
