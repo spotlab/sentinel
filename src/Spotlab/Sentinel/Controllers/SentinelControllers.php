@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Spotlab\Sentinel\Services\ConfigServiceProvider;
 use Spotlab\Sentinel\Services\MongoDatabase;
 
-
 /**
  * Guardian Provider.
  */
@@ -76,7 +75,7 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         $controllers->match('/api/content/{project}/{serie}', function (Request $request) use ($app) {
 
             // Get data from Database with GET Parameter
-            if($request->get('serie')) {
+            if ($request->get('serie')) {
                 $response = new JsonResponse(
                     $this->db->getSerie($request->get('project'), $request->get('serie')),
                     200, array('Cache-Control' => 'max-age=20, private, must-revalidate')
@@ -129,11 +128,11 @@ class SentinelControllers implements ServiceProviderInterface, ControllerProvide
         // HTML Pages
         $controllers->match('/{project}/{subproject}', function (Request $request) use ($app) {
 
-            if($request->get('project') && $request->get('subproject')) {
+            if ($request->get('project') && $request->get('subproject')) {
                 $p = $request->get('project');
                 $s = $request->get('subproject');
 
-                if(empty($app['sentinel.config']['projects'][$p]['projects'][$s])) {
+                if (empty($app['sentinel.config']['projects'][$p]['projects'][$s])) {
                     $app->abort(404, "Post $p/$s does not exist.");
                 }
 

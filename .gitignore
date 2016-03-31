@@ -10,6 +10,7 @@ phpunit
 /composer.phar
 
 # Config files
+*.sublime-*
 /database/
 *.yml
 *.json
