@@ -67,7 +67,7 @@ series:
         headers:
             Cache-Control: no-cache
             Content-Type: application/json;charset=UTF-8
-            Authorization: Basic bWVkb2NvY2Vhbl93ZWJzaXRlOjA4OTFkMGJl
+            Authorization: Basic cHVibGljX21lZG9jb2NlYW5fd2Vic2l0ZTpmODUxNjRkMGNjMTZiY2NkODM0NjRjNzYwN2ZkYmZlMw==
     reunion:
         title: Réunion
         url: http://www.reunion.fr/api/content/ts/reunion_v2/9854b2d6d91f2b2e2d512f6fd086820c
@@ -75,7 +75,7 @@ series:
         headers:
             Cache-Control: no-cache
             Content-Type: application/json;charset=UTF-8
-            Authorization: Basic cmV1bmlvbl93ZWJzaXRlIDo5ZjRmNWEzMA==
+            Authorization: Basic cHVibGljX3JldW5pb25fd2Vic2l0ZTo0M2VjODM5MTFhNjdiNTE5ZWRhZDExZDcxMDJlMTY4Mw==
     valleedordogne:
         title: Vallée Dordogne
         url: http://www.vallee-dordogne.com/api/content/ts/valleedordogne_v2/30e3d142ffd8b8b62aa1ded047baa40a
@@ -91,7 +91,7 @@ series:
         headers:
             Cache-Control: no-cache
             Content-Type: application/json;charset=UTF-8
-            Authorization: Basic YWR0X2xvdF93ZWJzaXRlOjgyYzc1N2I4
+            Authorization: Basic cHVibGljX2FkdF9sb3Rfd2Vic2l0ZTo4N2U3NTRiMTE0ZWNjNDMxODI2NDZkYTI5YTZjMTVlMA==
     beaune:
         title: Beaune
         url: http://www.beaune-tourisme.fr/api/content/ts/beaune_v2/3d35f5dc87b4ffcbc6c5737c1a031fdc
@@ -100,6 +100,7 @@ series:
             Cache-Control: no-cache
             Content-Type: application/json;charset=UTF-8
             Authorization: Basic cHVibGljX2JlYXVuZV93ZWJzaXRlOmQwYTliZGFmMzc3ZDhiZjQ4ZjAyZjJmNjQ1MDY0OGI4
+
 
 ```
 
