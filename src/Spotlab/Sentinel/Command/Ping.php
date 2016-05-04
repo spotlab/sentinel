@@ -52,6 +52,10 @@ class Ping extends Command
 
         foreach ($projects as $project_name => $project) {
             foreach ($project['series'] as $serie_name => $serie) {
+                if (!isset($serie['url'])) {
+                    continue;
+                }
+
                 // Get Options
                 $options = array();
                 $options['future'] = true;
